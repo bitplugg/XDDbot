@@ -15,3 +15,6 @@ local.properties
 *.log
 /keys/
 keystore.b64
+/worker/node_modules/
+/worker/.wrangler/
+/worker/package-lock.json

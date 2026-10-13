@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import xdbot.bitplugg.ru.data.BleKey
+import xdbot.bitplugg.ru.data.Telemetry
 import xdbot.bitplugg.ru.protocol.FrameCodec
 import xdbot.bitplugg.ru.protocol.Hex
 import xdbot.bitplugg.ru.protocol.Opcode
@@ -143,6 +144,7 @@ class ScooterBleClient(private val appContext: Context) {
             }
         }
         scanCallback = callback
+        Telemetry.event("scan_start")
         val settings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .build()
@@ -199,6 +201,7 @@ class ScooterBleClient(private val appContext: Context) {
         _state.value = ConnState.CONNECTING
         _status.value = "Подключение…"
         appendLog(LogKind.INFO, "Подключение к ${device.address}")
+        Telemetry.event("connect_attempt")
         gatt = device.connectGatt(appContext, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
         pendingCode = code
     }
@@ -335,6 +338,7 @@ class ScooterBleClient(private val appContext: Context) {
         }
         val frame = FrameCodec.encode(opcode.code, payload, _deviceType.value, rand.next())
         appendLog(LogKind.TX, "TX ${opcode.name} (0x${opcode.code.toString(16)})")
+        Telemetry.event("command", "opcode" to opcode.name)
         enqueue(frame)
     }
 
@@ -380,8 +384,10 @@ class ScooterBleClient(private val appContext: Context) {
             _status.value = "Готово · type $type"
             _state.value = ConnState.READY
             appendLog(LogKind.INFO, "Рукопожатие принято, deviceType=$type")
+            Telemetry.event("handshake_ok", "device_type" to type)
         } else if (decoded.command == Opcode.ERROR.code) {
             appendLog(LogKind.ERROR, "Устройство вернуло ошибку")
+            Telemetry.event("handshake_fail")
         }
     }
 

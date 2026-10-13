@@ -103,6 +103,19 @@ jobs:
           arch: x86_64
           script: ./gradlew connectedDebugAndroidTest --no-daemon
 
+  worker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Worker tests
+        run: node --test
+
   pages:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest

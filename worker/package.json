@@ -1,0 +1,15 @@
+{
+  "name": "xddbot-telemetry",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Opt-in anonymous telemetry collector for XDDBOT",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}

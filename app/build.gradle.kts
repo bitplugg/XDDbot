@@ -26,6 +26,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
+
+        buildConfigField(
+            "String",
+            "TELEMETRY_URL",
+            "\"${System.getenv("TELEMETRY_URL") ?: ""}\"",
+        )
     }
 
     signingConfigs {

@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,10 +37,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import xdbot.bitplugg.ru.data.BleKey
 import xdbot.bitplugg.ru.data.KeyFile
 import xdbot.bitplugg.ru.data.KeyRepository
+import xdbot.bitplugg.ru.data.Telemetry
 
 @Composable
 fun SettingsScreen(
@@ -55,6 +58,7 @@ fun SettingsScreen(
     var editing by remember { mutableStateOf<BleKey?>(null) }
     var status by remember { mutableStateOf<String?>(null) }
     var queueOpen by remember { mutableStateOf(false) }
+    var telemetryEnabled by remember { mutableStateOf(Telemetry.enabled) }
 
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -141,6 +145,53 @@ fun SettingsScreen(
                         }) { Text("Удал.") }
                     }
                 },
+            )
+        }
+
+        item { HorizontalDivider(modifier = Modifier.padding(top = 8.dp)) }
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Анонимная телеметрия", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        "Только имя события и версия приложения. Без ключей, кодов и адресов.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(
+                    checked = telemetryEnabled,
+                    enabled = Telemetry.available,
+                    onCheckedChange = {
+                        telemetryEnabled = it
+                        Telemetry.enabled = it
+                    },
+                )
+            }
+        }
+        if (!Telemetry.available) {
+            item {
+                Text(
+                    "Телеметрия недоступна: адрес сборщика не задан при сборке.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        item {
+            Text(
+                text = "Make by bitplugg XD",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 24.dp, bottom = 8.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -316,7 +367,7 @@ private fun KeyEditorDialog(
                     return@TextButton
                 }
                 BleKey.parse(keyText, deviceType)
-                    .onSuccess { hex -> onSave(label.trim(), hex, deviceType) }
+                    .onSuccess { code -> onSave(label.trim(), code, deviceType) }
                     .onFailure { error = it.message }
             }) { Text("Сохранить") }
         },

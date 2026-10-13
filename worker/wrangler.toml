@@ -1,0 +1,11 @@
+name = "xddbot-telemetry"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+workers_dev = true
+
+# Optional KV binding for counters. Create the namespace and uncomment:
+#   npx wrangler kv namespace create TELEMETRY
+# Without a binding the worker still validates and acknowledges events.
+# [[kv_namespaces]]
+# binding = "TELEMETRY"
+# id = "<your-namespace-id>"
