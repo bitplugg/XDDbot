@@ -3,37 +3,361 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0e0e0f">
+<meta name="description" content="XDDBOT — приложение-компаньон для вашего собственного электросамоката по BLE. Подключение, диагностика, команды, работа со своим ключом.">
+<meta property="og:title" content="XDDBOT">
+<meta property="og:description" content="Компаньон для вашего самоката: BLE-подключение, диагностика, команды и свой ключ.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://bitplugg.github.io/XDDbot/">
+<link rel="stylesheet" href="styles.css">
+<script>document.documentElement.classList.add("js")</script>
+<script src="site.js" defer></script>
 <title>XDDBOT</title>
-<style>
-  :root { color-scheme: dark; }
-  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; background: #101418; color: #e6edf3; }
-  main { max-width: 720px; margin: 0 auto; padding: 48px 20px; }
-  h1 { font-size: 2.4rem; margin: 0 0 .2em; }
-  .tag { color: #7DD3FC; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; font-size: .8rem; }
-  a.btn { display: inline-block; margin-top: 1.5em; padding: .8em 1.4em; border-radius: 999px;
-          background: #7DD3FC; color: #06222e; text-decoration: none; font-weight: 700; }
-  code { background: #1b2330; padding: .15em .4em; border-radius: 6px; }
-  ul { padding-left: 1.2em; }
-</style>
 </head>
 <body>
-<main>
-  <div class="tag">BLE scooter companion</div>
-  <h1>XDDBOT</h1>
-  <p>Клиент-компаньон для собственного самоката: подключение, диагностика, управление
-     по вашему ключу. Material You, без телеметрии в чужие сервисы.</p>
-  <ul>
-    <li>Unlock / Lock, Find car, RFID, Battery, Firmware</li>
-    <li>Просмотр обмена в журнале, сохранённые профили</li>
-    <li>Демо-режим для проверки без железа</li>
-  </ul>
-  <a class="btn" href="https://github.com/bitplugg/XDDbot/releases/latest">Скачать APK</a>
-  <p style="margin-top:2.5em">
-    Статический API: <code>/api/version.json</code>, <code>/api/features.json</code>,
-    <code>/api/devices.json</code>
-  </p>
-  <p><a href="https://github.com/bitplugg/XDDbot">Исходники на GitHub</a> ·
-     <a href="https://github.com/bitplugg/XDDbot/wiki">Wiki</a></p>
+<a class="skip" href="#content">К содержанию</a>
+
+<header class="topbar">
+  <a class="brand" href="#start"><span class="logo">X</span><span>XDDBOT</span><small>BLE companion</small></a>
+  <nav class="tabs" aria-label="Разделы">
+    <div class="tablist">
+      <a class="tab" href="#start" data-panel="start">Начало</a>
+      <a class="tab" href="#features" data-panel="features">Возможности</a>
+      <a class="tab" href="#setup" data-panel="setup">Установка</a>
+      <a class="tab" href="#keys" data-panel="keys">Ключи</a>
+      <a class="tab" href="#protocol" data-panel="protocol">Протокол</a>
+      <a class="tab" href="#api" data-panel="api">API</a>
+      <a class="tab" href="#build" data-panel="build">Сборка</a>
+      <a class="tab" href="#faq" data-panel="faq">FAQ</a>
+    </div>
+  </nav>
+  <p class="status"><a href="https://github.com/bitplugg/XDDbot/releases/latest">Скачать · GitHub →</a></p>
+</header>
+
+<main id="content" tabindex="-1">
+
+<!-- ============================ START ============================ -->
+<section class="panel" id="start" data-title="Начало" aria-labelledby="start-title">
+  <div class="panel-head intro">
+    <h1 id="start-title" tabindex="-1">XDDBOT</h1>
+    <p>Открытый клиент-компаньон для <strong>вашего собственного</strong> электросамоката: подключение по BLE, диагностика, команды и работа с вашим ключом устройства.</p>
+    <p>Материи Design You, без телеметрии в чужие сервисы и без чужой рекламы.</p>
+    <div class="actions">
+      <a class="button primary" href="https://github.com/bitplugg/XDDbot/releases/latest">Скачать APK</a>
+      <a class="button" href="#setup">Как установить</a>
+    </div>
+  </div>
+
+  <div class="note danger">
+    <p><strong>Только ваши устройства.</strong> XDDBOT хранит и передаёт лишь те ключи, которые вы вводите сами. В приложении нет генерации ключей, подбора, перебора или обхода чужих замков. Используйте его только на самокатах, которыми владеете вы или на работу с которыми у вас есть разрешение.</p>
+  </div>
+
+  <div class="section" id="what">
+    <h2>Что это</h2>
+    <div class="rows">
+      <div class="row"><div><h3>Компаньон, не замена</h3><p>XDDBOT не включает самокат «магически». Он повторяет штатный обмен того же типа, что и официальное приложение, используя ваш ключ.</p></div><span class="value">BLE</span></div>
+      <div class="row"><div><h3>Свой ключ</h3><p>Ключ устройства вы берёте там, где он у вас есть, и вводите вручную. Хранится в зашифрованном виде на телефоне.</p></div><span class="value">Локально</span></div>
+      <div class="row"><div><h3>Открытый код</h3><p>Исходники на GitHub, сборки в Releases, сайт и статический API на GitHub Pages.</p></div><span class="value muted">MIT-стиль</span></div>
+      <div class="row"><div><h3>Без аккаунтов</h3><p>Никакой регистрации, подписок и серверной авторизации. Нужен только сам телефон и самокат.</p></div><span class="value muted">Офлайн</span></div>
+    </div>
+  </div>
+
+  <div class="section" id="requirements">
+    <h2>Что нужно</h2>
+    <div class="rows">
+      <div class="row"><div><h3>Android 8.0 (API 26) и выше</h3><p>Целевая версия — Android 15 (API 35). Требуется поддержка Bluetooth LE.</p></div><span class="value">Обязательно</span></div>
+      <div class="row"><div><h3>Ключ вашего самоката</h3><p>Строка в hex, которую вы вводите в разделе «Настройки». Тип устройства по умолчанию — 66.</p></div><span class="value">Обязательно</span></div>
+      <div class="row"><div><h3>Разрешения</h3><p>Bluetooth (скан/подключение) и уведомления. Для сканирования на Android 11 и ниже — геолокация.</p></div><span class="value">Обязательно</span></div>
+      <div class="row"><div><h3>Самокат рядом</h3><p>Для реальной работы. Без железа можно включить демо-режим и пройти весь интерфейс.</p></div><span class="value muted">Опционально</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ FEATURES ============================ -->
+<section class="panel" id="features" data-title="Возможности" aria-labelledby="features-title">
+  <div class="panel-head">
+    <h1 id="features-title" tabindex="-1">Возможности</h1>
+    <p>Всё, что уже заложено в каркас, и то, что наполняется по мере развития.</p>
+  </div>
+
+  <div class="section">
+    <h2>Основное</h2>
+    <div class="cards">
+      <div class="card"><div class="ico">📡</div><h3>Скан и подключение</h3><p>Поиск BLE-устройств, подключение, авто-переподключение и просмотр журнала обмена в реальном времени.</p></div>
+      <div class="card"><div class="ico">🔑</div><h3>Свои ключи</h3><p>Ручной ввод ключа (hex), несколько профилей, выбор активного, безопасное хранение через EncryptedSharedPreferences.</p></div>
+      <div class="card"><div class="ico">🎛️</div><h3>Команды</h3><p>Unlock/Lock, Find car, RFID, батарея, информация об устройстве и прошивке — по таблице опкодов.</p></div>
+      <div class="card"><div class="ico">🧪</div><h3>Демо-режим</h3><p>Полный интерфейс без железа: удобно проверять сценарии и скриншоты.</p></div>
+      <div class="card"><div class="ico">🎨</div><h3>Material You</h3><p>Material 3 Expressive с динамическими цветами системы (Android 12+) и тёмной темой.</p></div>
+      <div class="card"><div class="ico">📝</div><h3>Журнал</h3><p>Читаемый лог кадров: направление, опкод, payload, CRC. Помогает разбираться в поведении устройства.</p></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Чего в приложении нет</h2>
+    <div class="rows">
+      <div class="row"><div><h3>Генерации и подбора ключей</h3><p>Никаких «универсальных ключей», брутфорса или предсказания. Это вне границ проекта.</p></div><span class="value warn">Нет</span></div>
+      <div class="row"><div><h3>Чужих серверов и аккаунтов</h3><p>Базовая авторизация оригинального клиента не используется. Приложение работает локально.</p></div><span class="value warn">Нет</span></div>
+      <div class="row"><div><h3>Скрытой телеметрии</h3><p>События вроде запуска и подключений не отправляются на сторонние серверы. Всё остаётся на устройстве.</p></div><span class="value warn">Нет</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ SETUP ============================ -->
+<section class="panel" id="setup" data-title="Установка" aria-labelledby="setup-title">
+  <div class="panel-head">
+    <h1 id="setup-title" tabindex="-1">Установка</h1>
+    <p>Четыре шага: поставить APK, ввести свой ключ, выдать разрешения, подключиться.</p>
+  </div>
+
+  <div class="steps">
+    <article class="step" id="install-apk">
+      <h3>Установите APK</h3>
+      <p>Скачайте <code>app-release.apk</code> со страницы <a href="https://github.com/bitplugg/XDDbot/releases/latest">Releases</a> и откройте файл. Подтвердите установку из неизвестного источника.</p>
+      <p>Debug-сборки имеют суффикс <code>.debug</code> и ставятся рядом с release-версией.</p>
+    </article>
+    <article class="step" id="add-key">
+      <h3>Добавьте свой ключ</h3>
+      <p>Откройте вкладку <strong>Настройки → Добавить ключ</strong>. Укажите название, hex-ключ и <code>deviceType</code> (по умолчанию 66). Новый ключ сразу становится активным.</p>
+      <p>Ключ хранится только на телефоне в зашифрованном виде и передаётся лишь подключённому самокату при рукопожатии.</p>
+    </article>
+    <article class="step" id="permissions">
+      <h3>Выдайте разрешения</h3>
+      <p>При первом скане приложение попросит доступ к <strong>Bluetooth</strong>. На Android 11 и ниже дополнительно нужен доступ к геолокации — так устроена система для BLE-сканирования.</p>
+    </article>
+    <article class="step" id="connect">
+      <h3>Подключитесь</h3>
+      <p>Во вкладке <strong>Скан</strong> выберите свой самокат. После подключения откроется экран <strong>Устройство</strong> с активным ключом и статусом.</p>
+      <p>Без железа включите демо-режим, чтобы пройти интерфейс.</p>
+    </article>
+  </div>
+
+  <div class="note tip">
+    <p>Проверка контрольной суммы APK: после скачивания можно сверить SHA-256 с тем, что указан в описании релиза.</p>
+  </div>
+</section>
+
+<!-- ============================ KEYS ============================ -->
+<section class="panel" id="keys" data-title="Ключи" aria-labelledby="keys-title">
+  <div class="panel-head">
+    <h1 id="keys-title" tabindex="-1">Ключи</h1>
+    <p>Как XDDBOT работает с ключом устройства — и почему только с вашим.</p>
+  </div>
+
+  <div class="section">
+    <h2>Что такое ключ устройства</h2>
+    <p>Это набор байт, который используется при рукопожатии: телефон и самокат подтверждают друг другу «свой» и только затем принимают команды. Ключ принадлежит конкретному самокату.</p>
+    <div class="note danger">
+      <p>XDDBOT <strong>не создаёт</strong> и <strong>не подбирает</strong> ключи. Он принимает только то значение, которое вы ввели вручную. Если у вас нет ключа — приложение не поможет его «найти».</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Правила ввода</h2>
+    <div class="rows">
+      <div class="row"><div><h3>Только hex</h3><p>Символы <code>0-9</code>, <code>A-F</code>. Пробелы игнорируются, префикс <code>0x</code> отбрасывается.</p></div><span class="value">Формат</span></div>
+      <div class="row"><div><h3>Чётная длина</h3><p>Число hex-символов должно делиться на два — каждая пара это один байт.</p></div><span class="value">Проверка</span></div>
+      <div class="row"><div><h3>Не длиннее 64 байт</h3><p>Верхний предел, чтобы отсекать случайную вставку. Для самоката обычно достаточно нескольких байт.</p></div><span class="value">Лимит</span></div>
+      <div class="row"><div><h3>deviceType 0..255</h3><p>Целое число. Значение по умолчанию — 66 (XM-профиль).</p></div><span class="value">Профиль</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Хранение</h2>
+    <p>Ключи лежат в файле настроек, зашифрованном мастер-ключом из Android Keystore (<code>EncryptedSharedPreferences</code>, AES-256). Резервное копирование приложения отключено, поэтому ключи не уезжают в бэкап облака.</p>
+  </div>
+
+  <div class="section">
+    <h2>API-модель профиля</h2>
+    <div class="code-wrap"><pre><code>BleKey(
+  id         = "&lt;uuid&gt;",      // идентификатор профиля
+  label      = "Мой самокат", // произвольное имя
+  keyHex     = "a1b2c3d4",    // normalised, без пробелов
+  deviceType = 66             // 0..255
+)</code></pre></div>
+  </div>
+</section>
+
+<!-- ============================ PROTOCOL ============================ -->
+<section class="panel" id="protocol" data-title="Протокол" aria-labelledby="protocol-title">
+  <div class="panel-head">
+    <h1 id="protocol-title" tabindex="-1">Протокол BLE</h1>
+    <p>Формат кадра, контрольные суммы, рукопожатие и команды. Реализация — модуль <code>xdbot.bitplugg.ru.protocol</code>.</p>
+  </div>
+
+  <div class="section" id="frame">
+    <h2>Кадр</h2>
+    <p>Каждый кадр маскируется случайным байтом <code>rand</code>, чтобы не стоял постоянный паттерн.</p>
+    <div class="code-wrap"><pre><code>A3 A4 len (rand+50) (devType^rand) (cmd^rand) payload^rand crc8</code></pre></div>
+    <div class="rows">
+      <div class="row"><div><h3><code>A3 A4</code> — маркер</h3><p>Начало кадра.</p></div></div>
+      <div class="row"><div><h3><code>len</code></h3><p>Длина payload в байтах.</p></div></div>
+      <div class="row"><div><h3><code>rand</code></h3><p>Случайный байт; в кадре хранится как <code>rand + 50</code>.</p></div></div>
+      <div class="row"><div><h3>маскирование</h3><p><code>devType</code>, <code>cmd</code> и payload побитово XOR-ятся с <code>rand</code>.</p></div></div>
+      <div class="row"><div><h3><code>crc8</code></h3><p>Контрольная сумма CRC-8/MAXIM по кадру.</p></div></div>
+    </div>
+  </div>
+
+  <div class="section" id="crc">
+    <h2>Контрольные суммы</h2>
+    <div class="rows">
+      <div class="row"><div><h3>CRC-8/MAXIM (Dallas)</h3><p>Для отдельного кадра. Полином отражённый, табличный. Проверочное значение для <code>"123456789"</code> — <code>0xA1</code>.</p></div><span class="value">Кадр</span></div>
+      <div class="row"><div><h3>CRC-16/MODBUS</h3><p>Для блока передачи данных. Отражённый полином <code>0xA001</code>, init <code>0xFFFF</code>. Проверочное значение — <code>0x4B37</code>.</p></div><span class="value">Передача</span></div>
+    </div>
+  </div>
+
+  <div class="section" id="handshake">
+    <h2>Рукопожатие и передача данных</h2>
+    <ol class="flow">
+      <li><strong>COMMUNICATION_KEY</strong><span>Опкод <code>1</code>. Телефон и устройство обмениваются ключом и открывают сессию.</span></li>
+      <li><strong>START</strong><span>Опкод <code>0xFB</code> (251). Объявляет тип передачи, число пакетов, CRC-16 и <code>deviceType</code>.</span></li>
+      <li><strong>DATA</strong><span>Опкод <code>0xFC</code> (252). Данные нарезаны по 16 байт, каждый пакет со своим CRC-16.</span></li>
+    </ol>
+  </div>
+
+  <div class="section" id="opcodes">
+    <h2>Опкоды (основные)</h2>
+    <p class="section-intro">Направление: <span class="dir bi">bi</span> обмен, <span class="dir set">set</span> только от телефона, <span class="dir notify">notify</span> только от устройства. Полный список — в <code>Opcode.kt</code>.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th class="code">Код</th><th>Команда</th><th>Напр.</th><th>Описание</th></tr></thead>
+        <tbody>
+          <tr><td class="code">1</td><td>COMMUNICATION_KEY</td><td><span class="dir bi">bi</span></td><td>Рукопожатие, обмен сессионным ключом</td></tr>
+          <tr><td class="code">5</td><td>UNLOCK</td><td><span class="dir bi">bi</span></td><td>Разблокировать</td></tr>
+          <tr><td class="code">16</td><td>ERROR</td><td><span class="dir notify">notify</span></td><td>Устройство отклонило команду</td></tr>
+          <tr><td class="code">21</td><td>LOCK</td><td><span class="dir bi">bi</span></td><td>Заблокировать</td></tr>
+          <tr><td class="code">49</td><td>DEVICE_INFO</td><td><span class="dir bi">bi</span></td><td>Информация об устройстве</td></tr>
+          <tr><td class="code">96</td><td>SCOOTER_INFO</td><td><span class="dir bi">bi</span></td><td>Сводка по самокату</td></tr>
+          <tr><td class="code">99</td><td>VEHICLE_REALTIME_INFO</td><td><span class="dir bi">bi</span></td><td>Данные в реальном времени</td></tr>
+          <tr><td class="code">120</td><td>FIND_CAR</td><td><span class="dir set">set</span></td><td>Поиск (звук/мигание)</td></tr>
+          <tr><td class="code">133</td><td>READ_RFID_CARD</td><td><span class="dir bi">bi</span></td><td>Чтение RFID-карты</td></tr>
+          <tr><td class="code">162</td><td>FIND_CAR_SOUND</td><td><span class="dir set">set</span></td><td>Звуковой поиск</td></tr>
+          <tr><td class="code">195</td><td>ACCESSORY_CONTROL</td><td><span class="dir set">set</span></td><td>Седло / кофр / шлем</td></tr>
+          <tr><td class="code">250</td><td>FW_DEVICE_INFO</td><td><span class="dir bi">bi</span></td><td>Сведения о прошивке</td></tr>
+          <tr><td class="code">251</td><td>FW_DEVICE_DATA / START</td><td><span class="dir bi">bi</span></td><td>Начало передачи блока</td></tr>
+          <tr><td class="code">252</td><td>FW_GET_FIRMWARE_DATA / DATA</td><td><span class="dir bi">bi</span></td><td>Пакет данных блока</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ API ============================ -->
+<section class="panel" id="api" data-title="API" aria-labelledby="api-title">
+  <div class="panel-head">
+    <h1 id="api-title" tabindex="-1">Статический API</h1>
+    <p>Небольшой набор JSON-файлов на GitHub Pages, который приложение может читать для проверки версии, флагов и профилей устройств.</p>
+  </div>
+
+  <div class="section">
+    <h2>Эндпоинты</h2>
+    <div class="api-grid">
+      <div class="endpoint"><span class="method get">GET</span><code>/api/version.json</code></div>
+      <div class="endpoint"><span class="method get">GET</span><code>/api/features.json</code></div>
+      <div class="endpoint"><span class="method get">GET</span><code>/api/devices.json</code></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>version.json</h2>
+    <div class="code-wrap"><pre><code>{
+  "latest": "0.1.0",
+  "minimum": "0.1.0",
+  "mandatory": false,
+  "url": "https://github.com/bitplugg/XDDbot/releases/latest"
+}</code></pre></div>
+  </div>
+
+  <div class="section">
+    <h2>features.json</h2>
+    <div class="code-wrap"><pre><code>{
+  "demoMode": true,
+  "autoReconnect": true,
+  "unlockTest": {
+    "enabled": true,
+    "defaultIntervalMs": 500,
+    "minIntervalMs": 200,
+    "maxAttempts": 100,
+    "autoStop": true
+  },
+  "commands": { "unlockLock": true, "findCar": true, "battery": true }
+}</code></pre></div>
+  </div>
+
+  <div class="section">
+    <h2>devices.json</h2>
+    <div class="code-wrap"><pre><code>{
+  "profiles": [
+    { "id": "xm-generic", "name": "Ninebot / Xiaomi (XM)", "deviceType": 66, "transferType": 0 }
+  ]
+}</code></pre></div>
+    <div class="note"><p>API отдаётся как статические файлы: без авторизации, без записи и без пользовательских данных.</p></div>
+  </div>
+</section>
+
+<!-- ============================ BUILD ============================ -->
+<section class="panel" id="build" data-title="Сборка" aria-labelledby="build-title">
+  <div class="panel-head">
+    <h1 id="build-title" tabindex="-1">Сборка и CI</h1>
+    <p>Локальная сборка, тесты и автоматика GitHub Actions.</p>
+  </div>
+
+  <div class="section">
+    <h2>Локально</h2>
+    <div class="code-wrap"><pre><code>./gradlew assembleDebug      # debug APK
+./gradlew test               # unit-тесты
+./gradlew lint               # линт
+./gradlew connectedDebugAndroidTest   # instrumented (нужен эмулятор/устройство)</code></pre></div>
+  </div>
+
+  <div class="section">
+    <h2>CI на GitHub Actions</h2>
+    <ol class="flow">
+      <li><strong>lint + unit</strong><span>Линт и модульные тесты на каждый push и pull request.</span></li>
+      <li><strong>instrumented</strong><span>Запуск инструментальных тестов на эмуляторе API 30.</span></li>
+      <li><strong>release</strong><span>Debug и подписанный release APK. По тегу <code>v*</code> файлы публикуются в GitHub Releases.</span></li>
+      <li><strong>pages</strong><span>Этот сайт и статический API деплоятся на GitHub Pages при пуше в <code>main</code>.</span></li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>Подпись release</h2>
+    <p>Ключ подписи задаётся через переменные окружения (или локальный <code>keystore.properties</code>, который не коммитится). В CI они лежат в секретах репозитория.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Секрет</th><th>Назначение</th></tr></thead>
+        <tbody>
+          <tr><td class="code">ANDROID_KEYSTORE_BASE64</td><td>release keystore в base64</td></tr>
+          <tr><td class="code">ANDROID_KEYSTORE_PASSWORD</td><td>пароль хранилища</td></tr>
+          <tr><td class="code">ANDROID_KEY_ALIAS</td><td>алиас ключа</td></tr>
+          <tr><td class="code">ANDROID_KEY_PASSWORD</td><td>пароль ключа</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ FAQ ============================ -->
+<section class="panel" id="faq" data-title="FAQ" aria-labelledby="faq-title">
+  <div class="panel-head">
+    <h1 id="faq-title" tabindex="-1">FAQ</h1>
+    <p>Частые вопросы по установке и работе.</p>
+  </div>
+  <div class="faq">
+    <details><summary>Приложение не находит мой самокат</summary><div><p>Убедитесь, что самокат включён, находится рядом и что выданы разрешения на Bluetooth (на Android 11 и ниже — и на геолокацию). Иногда помогает выключить и снова включить Bluetooth.</p></div></details>
+    <details><summary>Где взять ключ устройства?</summary><div><p>Ключ принадлежит вашему самокату. XDDBOT его не добывает и не подбирает. Вводите только то значение, которым вы законно располагаете.</p></div></details>
+    <details><summary>Можно ли пользоваться без самоката?</summary><div><p>Да, включите демо-режим. Интерфейс, журнал и настройки работают без железа; реального обмена по BLE не будет.</p></div></details>
+    <details><summary>Теряется ли ключ при обновлении?</summary><div><p>Нет. Ключи хранятся в зашифрованных настройках приложения. Debug-сборка (<code>.debug</code>) — отдельное приложение со своими настройками.</p></div></details>
+    <details><summary>Отправляет ли приложение что-то на серверы?</summary><div><p>Нет. Используется только статический API на GitHub Pages для чтения версии и флагов, без пользовательских данных и без фоновой телеметрии.</p></div></details>
+    <details><summary>Работает ли на iOS?</summary><div><p>Нет, проект только под Android (Kotlin + Jetpack Compose).</p></div></details>
+  </div>
+</section>
+
 </main>
+
+<footer>
+  <p>XDDBOT · <a href="https://github.com/bitplugg/XDDbot">GitHub</a> · <a href="https://github.com/bitplugg/XDDbot/releases/latest">Releases</a> · <a href="https://github.com/bitplugg/XDDbot/wiki">Wiki</a> · <a href="https://github.com/bitplugg/XDDbot/issues">Issues</a></p>
+  <p>Только для ваших собственных устройств. Ключи не генерируются и не подбираются.</p>
+</footer>
+
 </body>
 </html>
