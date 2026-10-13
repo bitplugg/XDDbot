@@ -1,0 +1,11 @@
+{
+  "profiles": [
+    {
+      "id": "xm-generic",
+      "name": "Ninebot / Xiaomi (XM)",
+      "deviceType": 66,
+      "transferType": 0,
+      "notes": "Базовый профиль. Ключ устройства вводится вручную."
+    }
+  ]
+}

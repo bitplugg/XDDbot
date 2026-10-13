@@ -1,0 +1,67 @@
+package xdbot.bitplugg.ru.ui
+
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+
+private enum class Tab(val label: String) {
+    SCAN("Скан"),
+    DEVICE("Устройство"),
+    SETTINGS("Настройки"),
+    LOGS("Логи"),
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun XddbotRoot() {
+    var tab by remember { mutableStateOf(Tab.SCAN) }
+
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("XDDBOT") }) },
+        bottomBar = {
+            NavigationBar {
+                Tab.entries.forEach { entry ->
+                    NavigationBarItem(
+                        selected = tab == entry,
+                        onClick = { tab = entry },
+                        icon = {},
+                        label = { Text(entry.label) },
+                    )
+                }
+            }
+        },
+    ) { padding ->
+        when (tab) {
+            Tab.SCAN -> PlaceholderScreen("Сканирование BLE", padding)
+            Tab.DEVICE -> PlaceholderScreen("Подключённое устройство", padding)
+            Tab.SETTINGS -> PlaceholderScreen("Настройки", padding)
+            Tab.LOGS -> PlaceholderScreen("Журнал BLE-обмена", padding)
+        }
+    }
+}
+
+@Composable
+private fun PlaceholderScreen(title: String, padding: PaddingValues) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(padding),
+    ) {
+        items(listOf(title, "Экран в разработке")) { line ->
+            ListItem(headlineContent = { Text(line) })
+        }
+    }
+}

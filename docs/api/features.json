@@ -1,0 +1,18 @@
+{
+  "demoMode": true,
+  "autoReconnect": true,
+  "unlockTest": {
+    "enabled": true,
+    "defaultIntervalMs": 500,
+    "minIntervalMs": 200,
+    "maxAttempts": 100,
+    "autoStop": true
+  },
+  "commands": {
+    "unlockLock": true,
+    "findCar": true,
+    "rfid": true,
+    "battery": true,
+    "firmware": true
+  }
+}
