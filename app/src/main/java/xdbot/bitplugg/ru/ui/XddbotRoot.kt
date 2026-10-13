@@ -18,6 +18,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import xdbot.bitplugg.ru.XddbotApp
+import xdbot.bitplugg.ru.ui.device.DeviceScreen
+import xdbot.bitplugg.ru.ui.settings.SettingsScreen
 
 private enum class Tab(val label: String) {
     SCAN("Скан"),
@@ -29,6 +33,7 @@ private enum class Tab(val label: String) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun XddbotRoot() {
+    val repository = (LocalContext.current.applicationContext as XddbotApp).keyRepository
     var tab by remember { mutableStateOf(Tab.SCAN) }
 
     Scaffold(
@@ -48,8 +53,8 @@ fun XddbotRoot() {
     ) { padding ->
         when (tab) {
             Tab.SCAN -> PlaceholderScreen("Сканирование BLE", padding)
-            Tab.DEVICE -> PlaceholderScreen("Подключённое устройство", padding)
-            Tab.SETTINGS -> PlaceholderScreen("Настройки", padding)
+            Tab.DEVICE -> DeviceScreen(repository, padding)
+            Tab.SETTINGS -> SettingsScreen(repository, padding)
             Tab.LOGS -> PlaceholderScreen("Журнал BLE-обмена", padding)
         }
     }
