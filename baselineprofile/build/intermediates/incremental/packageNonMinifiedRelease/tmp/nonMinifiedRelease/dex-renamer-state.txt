@@ -1,0 +1,10 @@
+#Wed Oct 14 00:38:53 MSK 2026
+base.2=/home/bitplugg/XDDbot/baselineprofile/build/intermediates/dex/nonMinifiedRelease/mergeProjectDexNonMinifiedRelease/12/classes.dex
+path.2=12/classes.dex
+base.1=/home/bitplugg/XDDbot/baselineprofile/build/intermediates/dex/nonMinifiedRelease/mergeProjectDexNonMinifiedRelease/0/classes.dex
+path.1=0/classes.dex
+base.0=/home/bitplugg/XDDbot/baselineprofile/build/intermediates/dex/nonMinifiedRelease/mergeExtDexNonMinifiedRelease/classes.dex
+renamed.2=classes3.dex
+renamed.1=classes2.dex
+renamed.0=classes.dex
+path.0=classes.dex

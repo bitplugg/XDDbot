@@ -29,6 +29,7 @@
       <a class="tab" href="#api" data-panel="api">API</a>
       <a class="tab" href="#build" data-panel="build">Сборка</a>
       <a class="tab" href="#faq" data-panel="faq">FAQ</a>
+      <a class="tab" href="#privacy" data-panel="privacy">Приватность</a>
     </div>
   </nav>
   <p class="status"><a href="https://github.com/bitplugg/XDDbot/releases/latest">Скачать · GitHub →</a></p>
@@ -97,7 +98,7 @@
     <div class="rows">
       <div class="row"><div><h3>Генерации и подбора ключей</h3><p>Никаких «универсальных ключей», брутфорса или предсказания. Это вне границ проекта.</p></div><span class="value warn">Нет</span></div>
       <div class="row"><div><h3>Чужих серверов и аккаунтов</h3><p>Базовая авторизация оригинального клиента не используется. Приложение работает локально.</p></div><span class="value warn">Нет</span></div>
-      <div class="row"><div><h3>Скрытой телеметрии</h3><p>События вроде запуска и подключений не отправляются на сторонние серверы. Всё остаётся на устройстве.</p></div><span class="value warn">Нет</span></div>
+      <div class="row"><div><h3>Скрытой телеметрии</h3><p>Сбор статистики по умолчанию выключен. Опциональную анонимную телеметрию можно включить только вручную в настройках — и выключить в любой момент.</p></div><span class="value warn">По умолчанию нет</span></div>
     </div>
   </div>
 </section>
@@ -347,15 +348,56 @@
     <details><summary>Где взять ключ устройства?</summary><div><p>Ключ принадлежит вашему самокату. XDDBOT его не добывает и не подбирает. Вводите только то значение, которым вы законно располагаете.</p></div></details>
     <details><summary>Можно ли пользоваться без самоката?</summary><div><p>Да, включите демо-режим. Интерфейс, журнал и настройки работают без железа; реального обмена по BLE не будет.</p></div></details>
     <details><summary>Теряется ли ключ при обновлении?</summary><div><p>Нет. Ключи хранятся в зашифрованных настройках приложения. Debug-сборка (<code>.debug</code>) — отдельное приложение со своими настройками.</p></div></details>
-    <details><summary>Отправляет ли приложение что-то на серверы?</summary><div><p>Нет. Используется только статический API на GitHub Pages для чтения версии и флагов, без пользовательских данных и без фоновой телеметрии.</p></div></details>
+    <details><summary>Отправляет ли приложение что-то на серверы?</summary><div><p>Статический API на GitHub Pages читается для проверки версии и профилей устройств — без пользовательских данных. Опциональная анонимная телеметрия по умолчанию выключена и включается только вручную в настройках. Подробнее — в разделе «Приватность».</p></div></details>
     <details><summary>Работает ли на iOS?</summary><div><p>Нет, проект только под Android (Kotlin + Jetpack Compose).</p></div></details>
+  </div>
+</section>
+
+<!-- ============================ PRIVACY ============================ -->
+<section class="panel" id="privacy" data-title="Приватность" aria-labelledby="privacy-title">
+  <div class="panel-head">
+    <h1 id="privacy-title" tabindex="-1">Приватность</h1>
+    <p>Что XDDBOT делает и не делает с вашими данными.</p>
+  </div>
+
+  <div class="section">
+    <h2>Коротко</h2>
+    <div class="rows">
+      <div class="row"><div><h3>Ключи — только на телефоне</h3><p>Введённые вами ключи хранятся локально в зашифрованном виде (<code>EncryptedSharedPreferences</code>) и передаются только подключённому самокату при рукопожатии.</p></div><span class="value">Локально</span></div>
+      <div class="row"><div><h3>Телеметрия выключена по умолчанию</h3><p>Приложение не отправляет данные, пока вы сами не включите анонимную телеметрию в настройках.</p></div><span class="value">Opt-in</span></div>
+      <div class="row"><div><h3>Без рекламы и сторонних SDK</h3><p>Нет рекламных сетей, трекеров и аналитических библиотек третьих сторон.</p></div><span class="value">Нет</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Если вы включите телеметрию</h2>
+    <p>Отправляются только:</p>
+    <ul>
+      <li>имя события — например, «запуск», «подключение», «команда»;</li>
+      <li>версия приложения;</li>
+      <li>случайный идентификатор установки (не связан с вами).</li>
+    </ul>
+    <div class="note danger">
+      <p>Никогда не отправляются: ключи и коды, адреса и имена BLE-устройств, координаты, содержимое журнала обмена. Сборщик отбрасывает запросы с такими данными.</p>
+    </div>
+    <p>Телеметрию можно выключить в любой момент в разделе «Настройки» — это прекращает отправку.</p>
+  </div>
+
+  <div class="section">
+    <h2>Что приложение читает из сети</h2>
+    <p>Статический API на GitHub Pages: <code>version.json</code> для проверки обновлений и <code>devices.json</code> со списком профилей устройств. Это обычные публичные файлы без авторизации и без пользовательских данных.</p>
+  </div>
+
+  <div class="section">
+    <h2>Контакты</h2>
+    <p>Вопросы и претензии — через <a href="https://github.com/bitplugg/XDDbot/issues">Issues</a> в репозитории.</p>
   </div>
 </section>
 
 </main>
 
 <footer>
-  <p>XDDBOT · <a href="https://github.com/bitplugg/XDDbot">GitHub</a> · <a href="https://github.com/bitplugg/XDDbot/releases/latest">Releases</a> · <a href="https://github.com/bitplugg/XDDbot/wiki">Wiki</a> · <a href="https://github.com/bitplugg/XDDbot/issues">Issues</a></p>
+  <p>XDDBOT · <a href="https://github.com/bitplugg/XDDbot">GitHub</a> · <a href="https://github.com/bitplugg/XDDbot/releases/latest">Releases</a> · <a href="https://github.com/bitplugg/XDDbot/wiki">Wiki</a> · <a href="#privacy">Приватность</a> · <a href="https://github.com/bitplugg/XDDbot/issues">Issues</a></p>
   <p>Только для ваших собственных устройств. Ключи не генерируются и не подбираются.</p>
 </footer>
 

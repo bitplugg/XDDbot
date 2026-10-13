@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "XDDbot"
 include(":app")
+include(":baselineprofile")

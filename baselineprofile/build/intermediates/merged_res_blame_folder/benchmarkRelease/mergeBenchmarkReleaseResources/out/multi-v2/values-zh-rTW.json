@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "xdbot.bitplugg.ru.baselineprofile-mergeBenchmarkReleaseResources-16:/values-zh-rTW/values-zh-rTW.xml",
+            "map": [
+                {
+                    "source": "/home/bitplugg/.gradle/caches/8.11.1/transforms/56a7d577cb297e90d12de641c436ddeb/transformed/core-1.9.0/res/values-zh-rTW/values-zh-rTW.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    }
+                }
+            ]
+        }
+    ]
+}
