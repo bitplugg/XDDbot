@@ -23,7 +23,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import xdbot.bitplugg.ru.R
 import xdbot.bitplugg.ru.ble.ConnState
 import xdbot.bitplugg.ru.ble.ScooterBleClient
 import xdbot.bitplugg.ru.data.KeyRepository
@@ -69,17 +71,17 @@ fun ScanScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column {
-                Text("Сканирование BLE", style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.scan_title), style = MaterialTheme.typography.titleLarge)
                 Text(status, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Button(onClick = { if (scanning) client.stopScan() else requestScan() }) {
-                Text(if (scanning) "Стоп" else "Сканировать")
+                Text(stringResource(if (scanning) R.string.scan_stop else R.string.scan_start))
             }
         }
 
         if (devices.isEmpty()) {
             Text(
-                if (scanning) "Поиск устройств…" else "Нажмите «Сканировать», чтобы найти свой самокат.",
+                stringResource(if (scanning) R.string.scan_searching else R.string.scan_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -94,9 +96,12 @@ fun ScanScreen(
                     },
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(device.name ?: "Без имени", style = MaterialTheme.typography.titleMedium)
                         Text(
-                            "${device.address} · ${device.rssi} dBm",
+                            device.name ?: stringResource(R.string.device_unnamed),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        Text(
+                            stringResource(R.string.device_address_rssi, device.address, device.rssi),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

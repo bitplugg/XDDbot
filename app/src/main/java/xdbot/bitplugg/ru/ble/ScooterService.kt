@@ -65,10 +65,10 @@ class ScooterService : Service() {
         val state = client.state.value
         val status = client.status.value
         val title = when (state) {
-            ConnState.READY -> "Самокат подключён"
-            ConnState.CONNECTING, ConnState.DISCOVERING, ConnState.AUTHENTICATING -> "Подключение…"
-            ConnState.SCANNING -> "XDDBOT"
-            else -> "XDDBOT"
+            ConnState.READY -> getString(R.string.notification_connected)
+            ConnState.CONNECTING, ConnState.DISCOVERING, ConnState.AUTHENTICATING ->
+                getString(R.string.notification_connecting)
+            else -> getString(R.string.app_name)
         }
         val contentIntent = PendingIntent.getActivity(
             this,
@@ -83,8 +83,8 @@ class ScooterService : Service() {
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setContentIntent(contentIntent)
-            .addAction(0, "Открыть", action(ACTION_UNLOCK))
-            .addAction(0, "Закрыть", action(ACTION_LOCK))
+            .addAction(0, getString(R.string.action_unlock), action(ACTION_UNLOCK))
+            .addAction(0, getString(R.string.action_lock), action(ACTION_LOCK))
             .build()
     }
 
@@ -111,7 +111,7 @@ class ScooterService : Service() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Подключение к самокату",
+            getString(R.string.notification_channel),
             NotificationManager.IMPORTANCE_LOW,
         )
         getSystemService(NotificationManager::class.java).createNotificationChannel(channel)

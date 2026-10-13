@@ -1,0 +1,112 @@
+<resources>
+    <string name="tab_scan">Scan</string>
+    <string name="tab_device">Device</string>
+    <string name="tab_data">Data</string>
+    <string name="tab_settings">Settings</string>
+    <string name="tab_logs">Logs</string>
+
+    <string name="update_title">Update %1$s available</string>
+    <string name="update_default_notes">Updating the app is recommended.</string>
+    <string name="update_download">Download</string>
+    <string name="update_later">Later</string>
+
+    <string name="scan_title">BLE scanning</string>
+    <string name="scan_start">Scan</string>
+    <string name="scan_stop">Stop</string>
+    <string name="scan_searching">Searching for devices…</string>
+    <string name="scan_hint">Tap “Scan” to find your scooter.</string>
+    <string name="device_unnamed">Unnamed</string>
+    <string name="device_unnamed_short">Untitled</string>
+    <string name="device_address_rssi">%1$s · %2$d dBm</string>
+
+    <string name="device_title">Device</string>
+    <string name="device_no_key">No key selected</string>
+    <string name="device_no_key_hint">Add your scooter\'s code in Settings.</string>
+    <string name="device_type_fmt">type %1$d</string>
+    <string name="device_status_fmt">Status: %1$s</string>
+    <string name="action_unlock">Unlock</string>
+    <string name="action_lock">Lock</string>
+    <string name="action_find">Find</string>
+    <string name="action_disconnect">Disconnect</string>
+    <string name="demo_title">Demo mode</string>
+    <string name="demo_subtitle">Simulate BLE without a real device.</string>
+
+    <string name="data_title">Device data</string>
+    <string name="data_hint">Values from the scooter. Tap Refresh to request fresh ones.</string>
+    <string name="data_battery">Battery</string>
+    <string name="data_no_data">no data</string>
+    <string name="data_battery_percent">%1$d%%</string>
+    <string name="data_speed">Speed</string>
+    <string name="data_trip">Trip</string>
+    <string name="data_range">Range</string>
+    <string name="data_current">Current</string>
+    <string name="data_voltage">Voltage</string>
+    <string name="data_mode">Mode</string>
+    <string name="data_lock">Lock</string>
+    <string name="data_locked">locked</string>
+    <string name="data_unlocked">unlocked</string>
+    <string name="data_firmware">Firmware</string>
+    <string name="data_version">Version</string>
+    <string name="data_info">Info</string>
+    <string name="data_rfid">RFID</string>
+    <string name="data_refresh">Refresh</string>
+    <string name="data_not_ready">Commands are available after connecting to the device.</string>
+    <string name="unit_kmh">%1$s km/h</string>
+    <string name="unit_km">%1$s km</string>
+    <string name="unit_a">%1$s A</string>
+    <string name="unit_v">%1$s V</string>
+
+    <string name="logs_title">BLE log</string>
+    <string name="logs_clear">Clear</string>
+    <string name="logs_empty">Empty for now. Connect to a device to see frames.</string>
+
+    <string name="settings_keys_title">Device keys</string>
+    <string name="settings_keys_hint">Enter a key only for your own scooter. XDDBOT does not generate or brute-force keys.</string>
+    <string name="settings_add_key">Add key</string>
+    <string name="settings_import">Load file</string>
+    <string name="settings_export">Export</string>
+    <string name="settings_queue_fmt">Code queue (%1$d)</string>
+    <string name="settings_profiles">Profiles (online)</string>
+    <string name="settings_import_read_error">Could not read the file</string>
+    <string name="settings_imported_fmt">Imported: %1$d</string>
+    <string name="settings_skipped_fmt">skipped: %1$d</string>
+    <string name="settings_exported_fmt">Exported: %1$d</string>
+    <string name="settings_export_error">Could not save the file</string>
+    <string name="settings_key_summary">%1$s · type %2$d · %3$d bytes</string>
+    <string name="settings_edit">Edit</string>
+    <string name="settings_delete">Del</string>
+    <string name="settings_telemetry_title">Anonymous telemetry</string>
+    <string name="settings_telemetry_hint">Event name and app version only. No keys, codes or addresses.</string>
+    <string name="settings_telemetry_unavailable">Telemetry unavailable: collector URL not set at build time.</string>
+    <string name="settings_footer">Make by bitplugg XD</string>
+
+    <string name="profiles_title">Device profiles</string>
+    <string name="profiles_error">Could not load profiles. Check your network.</string>
+    <string name="profiles_meta">deviceType=%1$d · transfer=%2$d</string>
+    <string name="profiles_create">Create key</string>
+
+    <string name="key_new">New key</string>
+    <string name="key_edit">Edit key</string>
+    <string name="key_label">Name</string>
+    <string name="key_code">Code or key</string>
+    <string name="key_code_placeholder">e.g. 1A2B3C4D5E6F</string>
+    <string name="key_device_type">deviceType (0..255)</string>
+    <string name="key_error_number">deviceType must be a number</string>
+
+    <string name="queue_title">Code queue</string>
+    <string name="queue_bytes_fmt">%1$d bytes</string>
+    <string name="queue_active">active</string>
+    <string name="queue_hint">Select a code manually and tap “Make active”. “Next” only switches the code — there is no automatic cycling.</string>
+    <string name="queue_prev">Prev</string>
+    <string name="queue_next">Next</string>
+    <string name="queue_set_active">Make active</string>
+
+    <string name="notification_connected">Scooter connected</string>
+    <string name="notification_connecting">Connecting…</string>
+    <string name="notification_channel">Scooter connection</string>
+
+    <string name="common_loading">Loading…</string>
+    <string name="common_close">Close</string>
+    <string name="common_save">Save</string>
+    <string name="common_cancel">Cancel</string>
+</resources>

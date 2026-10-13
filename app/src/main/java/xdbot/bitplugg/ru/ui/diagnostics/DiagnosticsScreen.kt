@@ -19,7 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import xdbot.bitplugg.ru.R
 import xdbot.bitplugg.ru.ble.ConnState
 import xdbot.bitplugg.ru.ble.ScooterBleClient
 
@@ -41,9 +43,9 @@ fun DiagnosticsScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Данные устройства", style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.data_title), style = MaterialTheme.typography.titleLarge)
         Text(
-            "Значения с самоката. Нажмите «Обновить», чтобы запросить свежие.",
+            stringResource(R.string.data_hint),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -53,26 +55,28 @@ fun DiagnosticsScreen(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Text("Батарея", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.data_battery), style = MaterialTheme.typography.labelLarge)
                 val battery = status.batteryPercent
                 if (battery == null) {
-                    Text("нет данных", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.data_no_data), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
                     LinearProgressIndicator(
                         progress = { battery / 100f },
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    Text("$battery%", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.data_battery_percent, battery), style = MaterialTheme.typography.headlineSmall)
                 }
-                StatusRow("Скорость", status.speedKmh?.let { "${fmt(it, 1)} км/ч" })
-                StatusRow("Пробег", status.tripKm?.let { "${fmt(it, 2)} км" })
-                StatusRow("Запас хода", status.rangeKm?.let { "${fmt(it, 2)} км" })
-                StatusRow("Ток", status.current?.let { "${fmt(it, 2)} A" })
-                StatusRow("Напряжение", status.voltage?.let { "${fmt(it, 2)} В" })
-                StatusRow("Режим", status.mode?.toString())
+                StatusRow(stringResource(R.string.data_speed), status.speedKmh?.let { stringResource(R.string.unit_kmh, fmt(it, 1)) })
+                StatusRow(stringResource(R.string.data_trip), status.tripKm?.let { stringResource(R.string.unit_km, fmt(it, 2)) })
+                StatusRow(stringResource(R.string.data_range), status.rangeKm?.let { stringResource(R.string.unit_km, fmt(it, 2)) })
+                StatusRow(stringResource(R.string.data_current), status.current?.let { stringResource(R.string.unit_a, fmt(it, 2)) })
+                StatusRow(stringResource(R.string.data_voltage), status.voltage?.let { stringResource(R.string.unit_v, fmt(it, 2)) })
+                StatusRow(stringResource(R.string.data_mode), status.mode?.toString())
                 StatusRow(
-                    "Замок",
-                    status.locked?.let { if (it) "закрыт" else "открыт" },
+                    stringResource(R.string.data_lock),
+                    status.locked?.let {
+                        stringResource(if (it) R.string.data_locked else R.string.data_unlocked)
+                    },
                 )
             }
         }
@@ -82,9 +86,9 @@ fun DiagnosticsScreen(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Text("Прошивка", style = MaterialTheme.typography.labelLarge)
-                StatusRow("Версия", status.firmware)
-                StatusRow("Инфо", status.firmwareInfo)
+                Text(stringResource(R.string.data_firmware), style = MaterialTheme.typography.labelLarge)
+                StatusRow(stringResource(R.string.data_version), status.firmware)
+                StatusRow(stringResource(R.string.data_info), status.firmwareInfo)
             }
         }
 
@@ -93,7 +97,7 @@ fun DiagnosticsScreen(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Text("RFID", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.data_rfid), style = MaterialTheme.typography.labelLarge)
                 StatusRow("ID", status.rfidCardId?.toString())
                 StatusRow("Hex", status.rfidCardHex)
             }
@@ -111,22 +115,22 @@ fun DiagnosticsScreen(
                 },
                 enabled = ready,
                 modifier = Modifier.weight(1f),
-            ) { Text("Обновить") }
+            ) { Text(stringResource(R.string.data_refresh)) }
             OutlinedButton(
                 onClick = { client.readRfid() },
                 enabled = ready,
                 modifier = Modifier.weight(1f),
-            ) { Text("RFID") }
+            ) { Text(stringResource(R.string.data_rfid)) }
             OutlinedButton(
                 onClick = { client.requestFirmwareInfo() },
                 enabled = ready,
                 modifier = Modifier.weight(1f),
-            ) { Text("Прошивка") }
+            ) { Text(stringResource(R.string.data_firmware)) }
         }
 
         if (!ready) {
             Text(
-                "Команды доступны после подключения к устройству.",
+                stringResource(R.string.data_not_ready),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

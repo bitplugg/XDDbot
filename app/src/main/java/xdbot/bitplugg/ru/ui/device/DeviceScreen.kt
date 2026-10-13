@@ -18,8 +18,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import xdbot.bitplugg.ru.R
 import xdbot.bitplugg.ru.ble.ConnState
 import xdbot.bitplugg.ru.ble.ScooterBleClient
 import xdbot.bitplugg.ru.data.KeyRepository
@@ -42,7 +44,7 @@ fun DeviceScreen(
         modifier = modifier.fillMaxSize().padding(contentPadding).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Устройство", style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.device_title), style = MaterialTheme.typography.titleLarge)
 
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(
@@ -50,34 +52,40 @@ fun DeviceScreen(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 if (active == null) {
-                    Text("Ключ не выбран")
+                    Text(stringResource(R.string.device_no_key))
                     Text(
-                        "Добавьте код своего самоката в разделе «Настройки».",
+                        stringResource(R.string.device_no_key_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 } else {
-                    Text(active.label.ifBlank { "Без названия" }, style = MaterialTheme.typography.titleMedium)
-                    Text("type $deviceType", style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        active.label.ifBlank { stringResource(R.string.device_unnamed_short) },
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        stringResource(R.string.device_type_fmt, deviceType),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
                     Text(active.code, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
 
-        Text("Статус: $status", style = MaterialTheme.typography.bodyMedium)
+        Text(stringResource(R.string.device_status_fmt, status), style = MaterialTheme.typography.bodyMedium)
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Button(onClick = { client.unlock() }, enabled = ready, modifier = Modifier.weight(1f)) {
-                Text("Открыть")
+                Text(stringResource(R.string.action_unlock))
             }
             Button(onClick = { client.lock() }, enabled = ready, modifier = Modifier.weight(1f)) {
-                Text("Закрыть")
+                Text(stringResource(R.string.action_lock))
             }
             OutlinedButton(onClick = { client.findCar() }, enabled = ready, modifier = Modifier.weight(1f)) {
-                Text("Сигнал")
+                Text(stringResource(R.string.action_find))
             }
         }
 
@@ -86,7 +94,7 @@ fun DeviceScreen(
             enabled = state != ConnState.IDLE,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Отключиться")
+            Text(stringResource(R.string.action_disconnect))
         }
 
         Row(
@@ -95,9 +103,9 @@ fun DeviceScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column {
-                Text("Демо-режим", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.demo_title), style = MaterialTheme.typography.titleMedium)
                 Text(
-                    "Имитация BLE без реального устройства.",
+                    stringResource(R.string.demo_subtitle),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -36,11 +36,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import xdbot.bitplugg.ru.R
 import xdbot.bitplugg.ru.data.BleKey
 import xdbot.bitplugg.ru.data.DeviceProfile
 import xdbot.bitplugg.ru.data.KeyFile
@@ -72,7 +74,7 @@ fun SettingsScreen(
         if (uri == null) return@rememberLauncherForActivityResult
         val text = readText(context, uri)
         if (text == null) {
-            status = "Не удалось прочитать файл"
+            status = context.getString(R.string.settings_import_read_error)
             return@rememberLauncherForActivityResult
         }
         val result = KeyFile.parse(text)
@@ -82,10 +84,28 @@ fun SettingsScreen(
         }
         revision++
         status = buildString {
-            append("Импортировано: ${result.keys.size}")
-            if (result.skipped > 0) append(" · пропущено: ${result.skipped}")
+            append(context.getString(R.string.settings_imported_fmt, result.keys.size))
+            if (result.skipped > 0) {
+                append(" · ").append(context.getString(R.string.settings_skipped_fmt, result.skipped))
+            }
         }
         if (result.keys.isNotEmpty()) queueOpen = true
+    }
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("text/plain"),
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val ok = runCatching {
+            context.contentResolver.openOutputStream(uri)?.use { stream ->
+                stream.write(KeyFile.format(keys).toByteArray(Charsets.UTF_8))
+            } ?: error("no output stream")
+        }.isSuccess
+        status = if (ok) {
+            context.getString(R.string.settings_exported_fmt, keys.size)
+        } else {
+            context.getString(R.string.settings_export_error)
+        }
     }
 
     LazyColumn(
@@ -93,10 +113,10 @@ fun SettingsScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        item { Text("Ключи устройства", style = MaterialTheme.typography.titleLarge) }
+        item { Text(stringResource(R.string.settings_keys_title), style = MaterialTheme.typography.titleLarge) }
         item {
             Text(
-                "Укажите ключ только для своего самоката. XDDBOT не генерирует и не подбирает ключи.",
+                stringResource(R.string.settings_keys_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -108,12 +128,19 @@ fun SettingsScreen(
                     editorDefaultType = BleKey.DEFAULT_DEVICE_TYPE
                     showEditor = true
                 }) {
-                    Text("Добавить ключ")
+                    Text(stringResource(R.string.settings_add_key))
                 }
                 OutlinedButton(onClick = {
                     status = null
                     importLauncher.launch(arrayOf("*/*"))
-                }) { Text("Загрузить файл") }
+                }) { Text(stringResource(R.string.settings_import)) }
+                OutlinedButton(
+                    onClick = {
+                        status = null
+                        exportLauncher.launch("xddbot-keys.txt")
+                    },
+                    enabled = keys.isNotEmpty(),
+                ) { Text(stringResource(R.string.settings_export)) }
             }
         }
         item {
@@ -121,12 +148,12 @@ fun SettingsScreen(
                 OutlinedButton(
                     onClick = { queueOpen = true },
                     enabled = keys.isNotEmpty(),
-                ) { Text("Очередь кодов (${keys.size})") }
+                ) { Text(stringResource(R.string.settings_queue_fmt, keys.size)) }
                 OutlinedButton(onClick = {
                     profiles = null
                     profilesOpen = true
                     scope.launch { profiles = RemoteConfig.fetchProfiles() ?: emptyList() }
-                }) { Text("Профили (онлайн)") }
+                }) { Text(stringResource(R.string.settings_profiles)) }
             }
         }
         status?.let { message ->
@@ -140,10 +167,10 @@ fun SettingsScreen(
         }
         items(keys, key = { it.id }) { key ->
             ListItem(
-                headlineContent = { Text(key.label.ifBlank { "Без названия" }) },
+                headlineContent = { Text(key.label.ifBlank { stringResource(R.string.device_unnamed_short) }) },
                 supportingContent = {
                     Text(
-                        "${key.code} · type ${key.deviceType} · ${key.keyBytes.size} байт",
+                        stringResource(R.string.settings_key_summary, key.code, key.deviceType, key.keyBytes.size),
                         fontFamily = FontFamily.Monospace,
                         style = MaterialTheme.typography.bodySmall,
                     )
@@ -157,11 +184,11 @@ fun SettingsScreen(
                                 revision++
                             },
                         )
-                        TextButton(onClick = { editing = key; showEditor = true }) { Text("Изм.") }
+                        TextButton(onClick = { editing = key; showEditor = true }) { Text(stringResource(R.string.settings_edit)) }
                         TextButton(onClick = {
                             repository.remove(key.id)
                             revision++
-                        }) { Text("Удал.") }
+                        }) { Text(stringResource(R.string.settings_delete)) }
                     }
                 },
             )
@@ -175,9 +202,9 @@ fun SettingsScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Анонимная телеметрия", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.settings_telemetry_title), style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "Только имя события и версия приложения. Без ключей, кодов и адресов.",
+                        stringResource(R.string.settings_telemetry_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -195,7 +222,7 @@ fun SettingsScreen(
         if (!Telemetry.available) {
             item {
                 Text(
-                    "Телеметрия недоступна: адрес сборщика не задан при сборке.",
+                    stringResource(R.string.settings_telemetry_unavailable),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -204,7 +231,7 @@ fun SettingsScreen(
 
         item {
             Text(
-                text = "Make by bitplugg XD",
+                text = stringResource(R.string.settings_footer),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 24.dp, bottom = 8.dp),
@@ -278,7 +305,7 @@ private fun KeyQueueDialog(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text("Очередь кодов")
+                Text(stringResource(R.string.queue_title))
                 Text(
                     "${index + 1} / ${keys.size}",
                     style = MaterialTheme.typography.labelLarge,
@@ -289,7 +316,7 @@ private fun KeyQueueDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    current.label.ifBlank { "Без названия" },
+                    current.label.ifBlank { stringResource(R.string.device_unnamed_short) },
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Surface(
@@ -309,15 +336,15 @@ private fun KeyQueueDialog(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    AssistChip(onClick = {}, label = { Text("type ${current.deviceType}") })
-                    AssistChip(onClick = {}, label = { Text("${current.keyBytes.size} байт") })
+                    AssistChip(onClick = {}, label = { Text(stringResource(R.string.device_type_fmt, current.deviceType)) })
+                    AssistChip(onClick = {}, label = { Text(stringResource(R.string.queue_bytes_fmt, current.keyBytes.size)) })
                     if (current.id == activeId) {
-                        AssistChip(onClick = {}, label = { Text("активный") })
+                        AssistChip(onClick = {}, label = { Text(stringResource(R.string.queue_active)) })
                     }
                 }
                 HorizontalDivider()
                 Text(
-                    "Выберите код вручную и нажмите «Сделать активным». «Далее» просто переключает код — автоматического перебора нет.",
+                    stringResource(R.string.queue_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -331,18 +358,18 @@ private fun KeyQueueDialog(
                 TextButton(
                     onClick = { if (index > 0) index-- },
                     enabled = index > 0,
-                ) { Text("Назад") }
+                ) { Text(stringResource(R.string.queue_prev)) }
                 TextButton(
                     onClick = { if (index < keys.lastIndex) index++ },
                     enabled = index < keys.lastIndex,
-                ) { Text("Далее") }
+                ) { Text(stringResource(R.string.queue_next)) }
                 TextButton(onClick = {
                     onSetActive(current.id)
                     onDismiss()
-                }) { Text("Сделать активным") }
+                }) { Text(stringResource(R.string.queue_set_active)) }
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Закрыть") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_close)) } },
     )
 }
 
@@ -354,17 +381,17 @@ private fun ProfilesDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Профили устройств") },
+        title = { Text(stringResource(R.string.profiles_title)) },
         text = {
             when {
-                profiles == null -> Text("Загрузка…")
-                profiles.isEmpty() -> Text("Не удалось загрузить профили. Проверьте сеть.")
+                profiles == null -> Text(stringResource(R.string.common_loading))
+                profiles.isEmpty() -> Text(stringResource(R.string.profiles_error))
                 else -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     profiles.forEach { profile ->
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             Text(profile.name, style = MaterialTheme.typography.titleMedium)
                             Text(
-                                "deviceType=${profile.deviceType} · transfer=${profile.transferType}",
+                                stringResource(R.string.profiles_meta, profile.deviceType, profile.transferType),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -375,13 +402,13 @@ private fun ProfilesDialog(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
-                            TextButton(onClick = { onCreate(profile) }) { Text("Создать ключ") }
+                            TextButton(onClick = { onCreate(profile) }) { Text(stringResource(R.string.profiles_create)) }
                         }
                     }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Закрыть") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_close)) } },
     )
 }
 
@@ -392,6 +419,7 @@ private fun KeyEditorDialog(
     onDismiss: () -> Unit,
     onSave: (label: String, code: String, deviceType: Int) -> Unit,
 ) {
+    val context = LocalContext.current
     var label by remember { mutableStateOf(initial?.label.orEmpty()) }
     var keyText by remember { mutableStateOf(initial?.code.orEmpty()) }
     var deviceTypeText by remember { mutableStateOf((initial?.deviceType ?: defaultDeviceType).toString()) }
@@ -399,13 +427,13 @@ private fun KeyEditorDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (initial == null) "Новый ключ" else "Изменить ключ") },
+        title = { Text(stringResource(if (initial == null) R.string.key_new else R.string.key_edit)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
                     value = label,
                     onValueChange = { label = it },
-                    label = { Text("Название") },
+                    label = { Text(stringResource(R.string.key_label)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -415,8 +443,8 @@ private fun KeyEditorDialog(
                         keyText = it
                         error = null
                     },
-                    label = { Text("Код или ключ") },
-                    placeholder = { Text("напр. 1A2B3C4D5E6F") },
+                    label = { Text(stringResource(R.string.key_code)) },
+                    placeholder = { Text(stringResource(R.string.key_code_placeholder)) },
                     singleLine = true,
                     isError = error != null,
                     supportingText = { error?.let { Text(it) } },
@@ -426,7 +454,7 @@ private fun KeyEditorDialog(
                 OutlinedTextField(
                     value = deviceTypeText,
                     onValueChange = { deviceTypeText = it.filter(Char::isDigit).take(3) },
-                    label = { Text("deviceType (0..255)") },
+                    label = { Text(stringResource(R.string.key_device_type)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -436,15 +464,15 @@ private fun KeyEditorDialog(
             TextButton(onClick = {
                 val deviceType = deviceTypeText.toIntOrNull()
                 if (deviceType == null) {
-                    error = "deviceType должен быть числом"
+                    error = context.getString(R.string.key_error_number)
                     return@TextButton
                 }
                 BleKey.parse(keyText, deviceType)
                     .onSuccess { code -> onSave(label.trim(), code, deviceType) }
                     .onFailure { error = it.message }
-            }) { Text("Сохранить") }
+            }) { Text(stringResource(R.string.common_save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Отмена") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) } },
     )
 }
 

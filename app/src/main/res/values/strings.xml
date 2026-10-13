@@ -1,3 +1,114 @@
 <resources>
     <string name="app_name">XDDBOT</string>
+
+    <string name="tab_scan">Скан</string>
+    <string name="tab_device">Устройство</string>
+    <string name="tab_data">Данные</string>
+    <string name="tab_settings">Настройки</string>
+    <string name="tab_logs">Логи</string>
+
+    <string name="update_title">Доступно обновление %1$s</string>
+    <string name="update_default_notes">Рекомендуется обновить приложение.</string>
+    <string name="update_download">Скачать</string>
+    <string name="update_later">Позже</string>
+
+    <string name="scan_title">Сканирование BLE</string>
+    <string name="scan_start">Сканировать</string>
+    <string name="scan_stop">Стоп</string>
+    <string name="scan_searching">Поиск устройств…</string>
+    <string name="scan_hint">Нажмите «Сканировать», чтобы найти свой самокат.</string>
+    <string name="device_unnamed">Без имени</string>
+    <string name="device_unnamed_short">Без названия</string>
+    <string name="device_address_rssi">%1$s · %2$d dBm</string>
+
+    <string name="device_title">Устройство</string>
+    <string name="device_no_key">Ключ не выбран</string>
+    <string name="device_no_key_hint">Добавьте код своего самоката в разделе «Настройки».</string>
+    <string name="device_type_fmt">type %1$d</string>
+    <string name="device_status_fmt">Статус: %1$s</string>
+    <string name="action_unlock">Открыть</string>
+    <string name="action_lock">Закрыть</string>
+    <string name="action_find">Сигнал</string>
+    <string name="action_disconnect">Отключиться</string>
+    <string name="demo_title">Демо-режим</string>
+    <string name="demo_subtitle">Имитация BLE без реального устройства.</string>
+
+    <string name="data_title">Данные устройства</string>
+    <string name="data_hint">Значения с самоката. Нажмите «Обновить», чтобы запросить свежие.</string>
+    <string name="data_battery">Батарея</string>
+    <string name="data_no_data">нет данных</string>
+    <string name="data_battery_percent">%1$d%%</string>
+    <string name="data_speed">Скорость</string>
+    <string name="data_trip">Пробег</string>
+    <string name="data_range">Запас хода</string>
+    <string name="data_current">Ток</string>
+    <string name="data_voltage">Напряжение</string>
+    <string name="data_mode">Режим</string>
+    <string name="data_lock">Замок</string>
+    <string name="data_locked">закрыт</string>
+    <string name="data_unlocked">открыт</string>
+    <string name="data_firmware">Прошивка</string>
+    <string name="data_version">Версия</string>
+    <string name="data_info">Инфо</string>
+    <string name="data_rfid">RFID</string>
+    <string name="data_refresh">Обновить</string>
+    <string name="data_not_ready">Команды доступны после подключения к устройству.</string>
+    <string name="unit_kmh">%1$s км/ч</string>
+    <string name="unit_km">%1$s км</string>
+    <string name="unit_a">%1$s A</string>
+    <string name="unit_v">%1$s В</string>
+
+    <string name="logs_title">Журнал BLE-обмена</string>
+    <string name="logs_clear">Очистить</string>
+    <string name="logs_empty">Пока пусто. Подключитесь к устройству, чтобы увидеть кадры.</string>
+
+    <string name="settings_keys_title">Ключи устройства</string>
+    <string name="settings_keys_hint">Укажите ключ только для своего самоката. XDDBOT не генерирует и не подбирает ключи.</string>
+    <string name="settings_add_key">Добавить ключ</string>
+    <string name="settings_import">Загрузить файл</string>
+    <string name="settings_export">Экспорт</string>
+    <string name="settings_queue_fmt">Очередь кодов (%1$d)</string>
+    <string name="settings_profiles">Профили (онлайн)</string>
+    <string name="settings_import_read_error">Не удалось прочитать файл</string>
+    <string name="settings_imported_fmt">Импортировано: %1$d</string>
+    <string name="settings_skipped_fmt">пропущено: %1$d</string>
+    <string name="settings_exported_fmt">Экспортировано: %1$d</string>
+    <string name="settings_export_error">Не удалось сохранить файл</string>
+    <string name="settings_key_summary">%1$s · type %2$d · %3$d байт</string>
+    <string name="settings_edit">Изм.</string>
+    <string name="settings_delete">Удал.</string>
+    <string name="settings_telemetry_title">Анонимная телеметрия</string>
+    <string name="settings_telemetry_hint">Только имя события и версия приложения. Без ключей, кодов и адресов.</string>
+    <string name="settings_telemetry_unavailable">Телеметрия недоступна: адрес сборщика не задан при сборке.</string>
+    <string name="settings_footer">Make by bitplugg XD</string>
+
+    <string name="profiles_title">Профили устройств</string>
+    <string name="profiles_error">Не удалось загрузить профили. Проверьте сеть.</string>
+    <string name="profiles_meta">deviceType=%1$d · transfer=%2$d</string>
+    <string name="profiles_create">Создать ключ</string>
+
+    <string name="key_new">Новый ключ</string>
+    <string name="key_edit">Изменить ключ</string>
+    <string name="key_label">Название</string>
+    <string name="key_code">Код или ключ</string>
+    <string name="key_code_placeholder">напр. 1A2B3C4D5E6F</string>
+    <string name="key_device_type">deviceType (0..255)</string>
+    <string name="key_error_number">deviceType должен быть числом</string>
+
+    <string name="queue_title">Очередь кодов</string>
+    <string name="queue_bytes_fmt">%1$d байт</string>
+    <string name="queue_active">активный</string>
+    <string name="queue_hint">Выберите код вручную и нажмите «Сделать активным». «Далее» просто переключает код — автоматического перебора нет.</string>
+    <string name="queue_prev">Назад</string>
+    <string name="queue_next">Далее</string>
+    <string name="queue_set_active">Сделать активным</string>
+
+    <string name="notification_connected">Самокат подключён</string>
+    <string name="notification_connecting">Подключение…</string>
+    <string name="notification_channel">Подключение к самокату</string>
+
+    <string name="common_loading">Загрузка…</string>
+    <string name="common_close">Закрыть</string>
+    <string name="common_save">Сохранить</string>
+    <string name="common_cancel">Отмена</string>
 </resources>

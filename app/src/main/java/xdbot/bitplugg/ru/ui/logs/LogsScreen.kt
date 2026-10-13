@@ -18,8 +18,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import xdbot.bitplugg.ru.R
 import xdbot.bitplugg.ru.ble.LogKind
 import xdbot.bitplugg.ru.ble.ScooterBleClient
 import java.text.SimpleDateFormat
@@ -47,13 +49,13 @@ fun LogsScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Журнал BLE-обмена", style = MaterialTheme.typography.titleLarge)
-            TextButton(onClick = { client.clearLog() }) { Text("Очистить") }
+            Text(stringResource(R.string.logs_title), style = MaterialTheme.typography.titleLarge)
+            TextButton(onClick = { client.clearLog() }) { Text(stringResource(R.string.logs_clear)) }
         }
 
         if (log.isEmpty()) {
             Text(
-                "Пока пусто. Подключитесь к устройству, чтобы увидеть кадры.",
+                stringResource(R.string.logs_empty),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
