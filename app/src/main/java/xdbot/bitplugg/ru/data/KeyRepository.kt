@@ -33,8 +33,8 @@ class KeyRepository(context: Context) {
         persist(list)
     }
 
-    fun add(label: String, keyHex: String, deviceType: Int): BleKey =
-        BleKey(UUID.randomUUID().toString(), label, keyHex, deviceType).also(::upsert)
+    fun add(label: String, code: String, deviceType: Int): BleKey =
+        BleKey(UUID.randomUUID().toString(), label, code, deviceType).also(::upsert)
 
     fun remove(id: String) {
         persist(keys().filterNot { it.id == id })
@@ -56,7 +56,7 @@ class KeyRepository(context: Context) {
                 JSONObject().apply {
                     put("id", key.id)
                     put("label", key.label)
-                    put("keyHex", key.keyHex)
+                    put("code", key.code)
                     put("deviceType", key.deviceType)
                 },
             )
@@ -67,14 +67,14 @@ class KeyRepository(context: Context) {
     private fun deserialize(arr: JSONArray) = sequence {
         for (i in 0 until arr.length()) {
             val o = arr.optJSONObject(i) ?: continue
-            val hex = o.optString("keyHex")
-            val parsed = BleKey.parse(hex, o.optInt("deviceType", BleKey.DEFAULT_DEVICE_TYPE))
+            val raw = o.optString("code").ifBlank { o.optString("keyHex") }
+            val parsed = BleKey.parse(raw, o.optInt("deviceType", BleKey.DEFAULT_DEVICE_TYPE))
             if (parsed.isSuccess) {
                 yield(
                     BleKey(
                         id = o.optString("id", UUID.randomUUID().toString()),
                         label = o.optString("label"),
-                        keyHex = parsed.getOrThrow(),
+                        code = parsed.getOrThrow(),
                         deviceType = o.optInt("deviceType", BleKey.DEFAULT_DEVICE_TYPE),
                     ),
                 )

@@ -1,5 +1,6 @@
 package xdbot.bitplugg.ru.data
 
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -7,26 +8,19 @@ import org.junit.Test
 class BleKeyTest {
 
     @Test
-    fun normalizesSpacesAnd0xPrefix() {
-        val result = BleKey.parse("0x1a 2B 3c")
-        assertEquals("1a2b3c", result.getOrThrow())
+    fun trimsAndAcceptsCode() {
+        assertEquals("12AB34CD", BleKey.parse("  12AB34CD  ").getOrThrow())
     }
 
     @Test
-    fun parsesBytes() {
-        val key = BleKey(id = "1", label = "test", keyHex = "deadbeef")
-        assertEquals(4, key.keyBytes.size)
-        assertEquals(-34, key.keyBytes[0].toInt())
+    fun bytesAreUtf8OfCode() {
+        val key = BleKey(id = "1", label = "test", code = "A1")
+        assertArrayEquals(byteArrayOf(0x41, 0x31), key.keyBytes)
     }
 
     @Test
-    fun rejectsNonHex() {
-        assertTrue(BleKey.parse("zz11").isFailure)
-    }
-
-    @Test
-    fun rejectsOddLength() {
-        assertTrue(BleKey.parse("abc").isFailure)
+    fun acceptsNonHexText() {
+        assertEquals("scooter-code-1", BleKey.parse("scooter-code-1").getOrThrow())
     }
 
     @Test
@@ -35,7 +29,12 @@ class BleKeyTest {
     }
 
     @Test
+    fun rejectsTooLong() {
+        assertTrue(BleKey.parse("a".repeat(256)).isFailure)
+    }
+
+    @Test
     fun rejectsOutOfRangeDeviceType() {
-        assertTrue(BleKey.parse("aa", deviceType = 300).isFailure)
+        assertTrue(BleKey.parse("12AB", deviceType = 300).isFailure)
     }
 }

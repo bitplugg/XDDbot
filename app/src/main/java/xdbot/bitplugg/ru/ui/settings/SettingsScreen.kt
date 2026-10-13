@@ -64,7 +64,7 @@ fun SettingsScreen(
             return@rememberLauncherForActivityResult
         }
         val result = KeyFile.parse(text)
-        result.keys.forEach { repository.add(it.label, it.keyHex, it.deviceType) }
+        result.keys.forEach { repository.add(it.label, it.code, it.deviceType) }
         if (result.keys.isNotEmpty() && repository.activeKey() == null) {
             repository.keys().firstOrNull()?.let { repository.setActive(it.id) }
         }
@@ -120,7 +120,7 @@ fun SettingsScreen(
                 headlineContent = { Text(key.label.ifBlank { "Без названия" }) },
                 supportingContent = {
                     Text(
-                        "${key.keyHex} · type ${key.deviceType} · ${key.keyBytes.size} байт",
+                        "${key.code} · type ${key.deviceType} · ${key.keyBytes.size} байт",
                         fontFamily = FontFamily.Monospace,
                         style = MaterialTheme.typography.bodySmall,
                     )
@@ -149,13 +149,13 @@ fun SettingsScreen(
         KeyEditorDialog(
             initial = editing,
             onDismiss = { showEditor = false },
-            onSave = { label, hex, deviceType ->
+            onSave = { label, code, deviceType ->
                 val current = editing
                 if (current == null) {
-                    val created = repository.add(label, hex, deviceType)
+                    val created = repository.add(label, code, deviceType)
                     repository.setActive(created.id)
                 } else {
-                    repository.upsert(current.copy(label = label, keyHex = hex, deviceType = deviceType))
+                    repository.upsert(current.copy(label = label, code = code, deviceType = deviceType))
                 }
                 revision++
                 showEditor = false
@@ -214,7 +214,7 @@ private fun KeyQueueDialog(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        current.keyHex,
+                        current.code,
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.SemiBold,
                         style = MaterialTheme.typography.headlineSmall,
@@ -266,10 +266,10 @@ private fun KeyQueueDialog(
 private fun KeyEditorDialog(
     initial: BleKey?,
     onDismiss: () -> Unit,
-    onSave: (label: String, keyHex: String, deviceType: Int) -> Unit,
+    onSave: (label: String, code: String, deviceType: Int) -> Unit,
 ) {
     var label by remember { mutableStateOf(initial?.label.orEmpty()) }
-    var keyText by remember { mutableStateOf(initial?.keyHex.orEmpty()) }
+    var keyText by remember { mutableStateOf(initial?.code.orEmpty()) }
     var deviceTypeText by remember { mutableStateOf((initial?.deviceType ?: BleKey.DEFAULT_DEVICE_TYPE).toString()) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -291,7 +291,7 @@ private fun KeyEditorDialog(
                         keyText = it
                         error = null
                     },
-                    label = { Text("Ключ (hex)") },
+                    label = { Text("Код или ключ") },
                     placeholder = { Text("напр. 1A2B3C4D5E6F") },
                     singleLine = true,
                     isError = error != null,
