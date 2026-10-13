@@ -170,7 +170,7 @@ class ScooterBleClient(private val appContext: Context) {
     // ------------------------------ connection -----------------------------
 
     @Suppress("MissingPermission")
-    fun connect(device: BluetoothDevice, code: String?) {
+    fun connect(device: BluetoothDevice?, code: String?) {
         if (demoMode) {
             _state.value = ConnState.CONNECTING
             _status.value = "Демо: подключение"
@@ -183,6 +183,11 @@ class ScooterBleClient(private val appContext: Context) {
                 _status.value = "Демо: готово"
                 _state.value = ConnState.READY
             }
+            return
+        }
+        if (device == null) {
+            appendLog(LogKind.ERROR, "Демо-устройство недоступно вне демо-режима")
+            _state.value = ConnState.ERROR
             return
         }
         if (!hasConnectPermission()) {
@@ -415,6 +420,11 @@ class ScooterBleClient(private val appContext: Context) {
         if (!ok) {
             writing = false
             appendLog(LogKind.ERROR, "Не удалось записать кадр")
+            return
+        }
+        if (writeType == BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE) {
+            writing = false
+            writeNext()
         }
     }
 
@@ -448,16 +458,9 @@ class ScooterBleClient(private val appContext: Context) {
         _log.value = (_log.value + entry).takeLast(500)
     }
 
-    private fun demoDevices(): List<DiscoveredDevice> {
-        return listOf(
-            DiscoveredDevice("LostBot demo", "AA:BB:CC:DD:EE:01", -42, demoDevice("AA:BB:CC:DD:EE:01")),
-            DiscoveredDevice("Scooter demo", "AA:BB:CC:DD:EE:02", -67, demoDevice("AA:BB:CC:DD:EE:02")),
-        )
-    }
-
     @Suppress("MissingPermission")
-    private fun demoDevice(address: String): BluetoothDevice {
-        val real = adapter?.getRemoteDevice(address)
-        return real ?: error("Bluetooth недоступен для демо")
-    }
+    private fun demoDevices(): List<DiscoveredDevice> = listOf(
+        DiscoveredDevice("LostBot demo", "AA:BB:CC:DD:EE:01", -42, runCatching { adapter?.getRemoteDevice("AA:BB:CC:DD:EE:01") }.getOrNull()),
+        DiscoveredDevice("Scooter demo", "AA:BB:CC:DD:EE:02", -67, runCatching { adapter?.getRemoteDevice("AA:BB:CC:DD:EE:02") }.getOrNull()),
+    )
 }

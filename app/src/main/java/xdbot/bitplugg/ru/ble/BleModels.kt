@@ -6,7 +6,7 @@ data class DiscoveredDevice(
     val name: String?,
     val address: String,
     val rssi: Int,
-    val device: BluetoothDevice,
+    val device: BluetoothDevice? = null,
 )
 
 enum class ConnState { IDLE, SCANNING, CONNECTING, DISCOVERING, AUTHENTICATING, READY, ERROR }
