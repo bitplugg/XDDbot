@@ -2,13 +2,15 @@ package xdbot.bitplugg.ru
 
 import android.app.Application
 import xdbot.bitplugg.ru.ble.ScooterBleClient
+import xdbot.bitplugg.ru.data.AppPreferences
 import xdbot.bitplugg.ru.data.KeyRepository
 import xdbot.bitplugg.ru.data.Telemetry
 
 class XddbotApp : Application() {
 
     val keyRepository: KeyRepository by lazy { KeyRepository(this) }
-    val bleClient: ScooterBleClient by lazy { ScooterBleClient(this) }
+    val appPreferences: AppPreferences by lazy { AppPreferences(this) }
+    val bleClient: ScooterBleClient by lazy { ScooterBleClient(this, appPreferences) }
 
     override fun onCreate() {
         super.onCreate()

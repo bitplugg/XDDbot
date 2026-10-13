@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,9 +40,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import xdbot.bitplugg.ru.data.BleKey
+import xdbot.bitplugg.ru.data.DeviceProfile
 import xdbot.bitplugg.ru.data.KeyFile
 import xdbot.bitplugg.ru.data.KeyRepository
+import xdbot.bitplugg.ru.data.RemoteConfig
 import xdbot.bitplugg.ru.data.Telemetry
 
 @Composable
@@ -59,6 +63,10 @@ fun SettingsScreen(
     var status by remember { mutableStateOf<String?>(null) }
     var queueOpen by remember { mutableStateOf(false) }
     var telemetryEnabled by remember { mutableStateOf(Telemetry.enabled) }
+    var profilesOpen by remember { mutableStateOf(false) }
+    var profiles by remember { mutableStateOf<List<DeviceProfile>?>(null) }
+    var editorDefaultType by remember { mutableIntStateOf(BleKey.DEFAULT_DEVICE_TYPE) }
+    val scope = rememberCoroutineScope()
 
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -95,7 +103,11 @@ fun SettingsScreen(
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilledTonalButton(onClick = { editing = null; showEditor = true }) {
+                FilledTonalButton(onClick = {
+                    editing = null
+                    editorDefaultType = BleKey.DEFAULT_DEVICE_TYPE
+                    showEditor = true
+                }) {
                     Text("Добавить ключ")
                 }
                 OutlinedButton(onClick = {
@@ -105,10 +117,17 @@ fun SettingsScreen(
             }
         }
         item {
-            OutlinedButton(
-                onClick = { queueOpen = true },
-                enabled = keys.isNotEmpty(),
-            ) { Text("Очередь кодов (${keys.size})") }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = { queueOpen = true },
+                    enabled = keys.isNotEmpty(),
+                ) { Text("Очередь кодов (${keys.size})") }
+                OutlinedButton(onClick = {
+                    profiles = null
+                    profilesOpen = true
+                    scope.launch { profiles = RemoteConfig.fetchProfiles() ?: emptyList() }
+                }) { Text("Профили (онлайн)") }
+            }
         }
         status?.let { message ->
             item {
@@ -196,9 +215,23 @@ fun SettingsScreen(
         }
     }
 
+    if (profilesOpen) {
+        ProfilesDialog(
+            profiles = profiles,
+            onCreate = { profile ->
+                editorDefaultType = profile.deviceType
+                editing = null
+                profilesOpen = false
+                showEditor = true
+            },
+            onDismiss = { profilesOpen = false },
+        )
+    }
+
     if (showEditor) {
         KeyEditorDialog(
             initial = editing,
+            defaultDeviceType = editorDefaultType,
             onDismiss = { showEditor = false },
             onSave = { label, code, deviceType ->
                 val current = editing
@@ -314,14 +347,54 @@ private fun KeyQueueDialog(
 }
 
 @Composable
+private fun ProfilesDialog(
+    profiles: List<DeviceProfile>?,
+    onCreate: (DeviceProfile) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Профили устройств") },
+        text = {
+            when {
+                profiles == null -> Text("Загрузка…")
+                profiles.isEmpty() -> Text("Не удалось загрузить профили. Проверьте сеть.")
+                else -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    profiles.forEach { profile ->
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(profile.name, style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                "deviceType=${profile.deviceType} · transfer=${profile.transferType}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            if (profile.notes.isNotBlank()) {
+                                Text(
+                                    profile.notes,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            TextButton(onClick = { onCreate(profile) }) { Text("Создать ключ") }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("Закрыть") } },
+    )
+}
+
+@Composable
 private fun KeyEditorDialog(
     initial: BleKey?,
+    defaultDeviceType: Int,
     onDismiss: () -> Unit,
     onSave: (label: String, code: String, deviceType: Int) -> Unit,
 ) {
     var label by remember { mutableStateOf(initial?.label.orEmpty()) }
     var keyText by remember { mutableStateOf(initial?.code.orEmpty()) }
-    var deviceTypeText by remember { mutableStateOf((initial?.deviceType ?: BleKey.DEFAULT_DEVICE_TYPE).toString()) }
+    var deviceTypeText by remember { mutableStateOf((initial?.deviceType ?: defaultDeviceType).toString()) }
     var error by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(

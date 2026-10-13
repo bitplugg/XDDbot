@@ -26,12 +26,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import xdbot.bitplugg.ru.data.AppPreferences
 import xdbot.bitplugg.ru.data.BleKey
 import xdbot.bitplugg.ru.data.Telemetry
 import xdbot.bitplugg.ru.protocol.FrameCodec
 import xdbot.bitplugg.ru.protocol.Hex
 import xdbot.bitplugg.ru.protocol.Opcode
+import xdbot.bitplugg.ru.protocol.PayloadDecoder
 import xdbot.bitplugg.ru.protocol.RandSource
+import xdbot.bitplugg.ru.protocol.ScooterStatus
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.ArrayBlockingQueue
 
@@ -40,7 +43,10 @@ import java.util.concurrent.ArrayBlockingQueue
  * All state is exposed as [StateFlow]; callbacks are marshalled through the flows directly
  * (Kotlin flows are thread-safe for emission).
  */
-class ScooterBleClient(private val appContext: Context) {
+class ScooterBleClient(
+    private val appContext: Context,
+    private val preferences: AppPreferences? = null,
+) {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val rand = RandSource.counter()
@@ -59,6 +65,9 @@ class ScooterBleClient(private val appContext: Context) {
 
     private val _deviceType = MutableStateFlow(BleKey.DEFAULT_DEVICE_TYPE)
     val deviceType: StateFlow<Int> = _deviceType.asStateFlow()
+
+    private val _telemetry = MutableStateFlow(ScooterStatus())
+    val telemetry: StateFlow<ScooterStatus> = _telemetry.asStateFlow()
 
     private val _demo = MutableStateFlow(false)
     val demo: StateFlow<Boolean> = _demo.asStateFlow()
@@ -196,14 +205,23 @@ class ScooterBleClient(private val appContext: Context) {
             appendLog(LogKind.ERROR, "Нет разрешения на подключение Bluetooth")
             return
         }
+        preferences?.lastDeviceAddress = device.address
+        preferences?.lastDeviceName = runCatching { device.name }.getOrNull()
         closeGatt()
         incoming.reset()
+        _telemetry.value = ScooterStatus()
         _state.value = ConnState.CONNECTING
         _status.value = "Подключение…"
         appendLog(LogKind.INFO, "Подключение к ${device.address}")
         Telemetry.event("connect_attempt")
         gatt = device.connectGatt(appContext, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
         pendingCode = code
+    }
+
+    @Suppress("MissingPermission")
+    fun connect(address: String, code: String?) {
+        val device = runCatching { adapter?.getRemoteDevice(address) }.getOrNull()
+        connect(device, code)
     }
 
     @Suppress("MissingPermission")
@@ -322,6 +340,11 @@ class ScooterBleClient(private val appContext: Context) {
     fun unlock() = sendCommand(Opcode.UNLOCK)
     fun lock() = sendCommand(Opcode.LOCK)
     fun findCar() = sendCommand(Opcode.FIND_CAR)
+    fun requestInfo() = sendCommand(Opcode.SCOOTER_INFO)
+    fun requestRealtime() = sendCommand(Opcode.VEHICLE_REALTIME_INFO)
+    fun requestDeviceInfo() = sendCommand(Opcode.DEVICE_INFO)
+    fun requestFirmwareInfo() = sendCommand(Opcode.FW_DEVICE_INFO)
+    fun readRfid() = sendCommand(Opcode.READ_RFID_CARD)
 
     fun sendCommand(opcode: Opcode, payload: ByteArray = ByteArray(0)) {
         if (demoMode) {
@@ -373,11 +396,14 @@ class ScooterBleClient(private val appContext: Context) {
             return
         }
         val opcode = Opcode.from(decoded.command)
+        val summary = PayloadDecoder.describe(decoded.command, decoded.payload)
         appendLog(
             LogKind.RX,
             "RX ${opcode?.name ?: "0x${decoded.command.toString(16)}"} " +
-                "[${Hex.encode(decoded.payload, spaced = false)}]",
+                "[${Hex.encode(decoded.payload, spaced = false)}]" +
+                (if (summary.isNotEmpty()) " · $summary" else ""),
         )
+        _telemetry.value = PayloadDecoder.apply(_telemetry.value, decoded.command, decoded.payload)
         if (decoded.command == Opcode.COMMUNICATION_KEY.code) {
             val type = if (decoded.payload.isNotEmpty()) decoded.payload[0].toInt() and 0xFF else _deviceType.value
             _deviceType.value = type

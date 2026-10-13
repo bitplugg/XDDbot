@@ -32,6 +32,11 @@ android {
             "TELEMETRY_URL",
             "\"${System.getenv("TELEMETRY_URL") ?: ""}\"",
         )
+        buildConfigField(
+            "String",
+            "API_BASE_URL",
+            "\"${System.getenv("API_BASE_URL") ?: "https://bitplugg.github.io/XDDbot/api/"}\"",
+        )
     }
 
     signingConfigs {

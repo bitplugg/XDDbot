@@ -48,7 +48,11 @@ fun ScanScreen(
 
     fun requestScan() {
         val needed = if (Build.VERSION.SDK_INT >= 31) {
-            arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+            arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
         } else {
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
         }
