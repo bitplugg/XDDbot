@@ -346,6 +346,18 @@ class ScooterBleClient(
     fun requestFirmwareInfo() = sendCommand(Opcode.FW_DEVICE_INFO)
     fun readRfid() = sendCommand(Opcode.READ_RFID_CARD)
 
+    // --------------------------- extended commands -------------------------
+
+    fun findCarSound(id: Int) = sendCommand(Opcode.FIND_CAR_SOUND, byteArrayOf(id.toByte()))
+
+    fun accessory(target: Accessory, open: Boolean) =
+        sendCommand(Opcode.ACCESSORY_CONTROL, byteArrayOf(target.code, (if (open) 1 else 2).toByte()))
+
+    fun headlight(on: Boolean) =
+        sendCommand(Opcode.SCOOTER_SET, byteArrayOf((if (on) 2 else 1).toByte(), 0, 0, 0))
+
+    fun batteryUnlock() = sendCommand(Opcode.BATTERY_UNLOCK, byteArrayOf(1))
+
     fun sendCommand(opcode: Opcode, payload: ByteArray = ByteArray(0)) {
         if (demoMode) {
             appendLog(LogKind.TX, "TX ${opcode.name} (demo)")
@@ -495,4 +507,11 @@ class ScooterBleClient(
         DiscoveredDevice("LostBot demo", "AA:BB:CC:DD:EE:01", -42, runCatching { adapter?.getRemoteDevice("AA:BB:CC:DD:EE:01") }.getOrNull()),
         DiscoveredDevice("Scooter demo", "AA:BB:CC:DD:EE:02", -67, runCatching { adapter?.getRemoteDevice("AA:BB:CC:DD:EE:02") }.getOrNull()),
     )
+}
+
+/** Openable accessories controlled by [Opcode.ACCESSORY_CONTROL]. */
+enum class Accessory(val code: Byte) {
+    SEAT(1),
+    TRUNK(3),
+    HELMET(8),
 }

@@ -109,4 +109,14 @@
     <string name="common_close">Close</string>
     <string name="common_save">Save</string>
     <string name="common_cancel">Cancel</string>
+
+    <string name="extras_title">Extras</string>
+    <string name="extra_light_on">Light on</string>
+    <string name="extra_light_off">Light off</string>
+    <string name="extra_sound">Horn sound</string>
+    <string name="extra_accessories">Accessories</string>
+    <string name="accessory_helmet">Helmet</string>
+    <string name="accessory_seat">Seat</string>
+    <string name="accessory_trunk">Trunk</string>
+    <string name="extra_battery_unlock">Unlock battery</string>
 </resources>

@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import xdbot.bitplugg.ru.R
+import xdbot.bitplugg.ru.ble.Accessory
 import xdbot.bitplugg.ru.ble.ConnState
 import xdbot.bitplugg.ru.ble.ScooterBleClient
 import xdbot.bitplugg.ru.data.KeyRepository
@@ -97,6 +98,57 @@ fun DeviceScreen(
             Text(stringResource(R.string.action_disconnect))
         }
 
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(stringResource(R.string.extras_title), style = MaterialTheme.typography.titleMedium)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    OutlinedButton(onClick = { client.headlight(true) }, enabled = ready, modifier = Modifier.weight(1f)) {
+                        Text(stringResource(R.string.extra_light_on))
+                    }
+                    OutlinedButton(onClick = { client.headlight(false) }, enabled = ready, modifier = Modifier.weight(1f)) {
+                        Text(stringResource(R.string.extra_light_off))
+                    }
+                }
+
+                Text(stringResource(R.string.extra_sound), style = MaterialTheme.typography.labelLarge)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    listOf(1, 2, 3, 6).forEach { id ->
+                        OutlinedButton(
+                            onClick = { client.findCarSound(id) },
+                            enabled = ready,
+                            modifier = Modifier.weight(1f),
+                            contentPadding = PaddingValues(0.dp),
+                        ) {
+                            Text(id.toString())
+                        }
+                    }
+                }
+
+                Text(stringResource(R.string.extra_accessories), style = MaterialTheme.typography.labelLarge)
+                AccessoryRow(R.string.accessory_helmet, Accessory.HELMET, ready, client)
+                AccessoryRow(R.string.accessory_seat, Accessory.SEAT, ready, client)
+                AccessoryRow(R.string.accessory_trunk, Accessory.TRUNK, ready, client)
+
+                OutlinedButton(
+                    onClick = { client.batteryUnlock() },
+                    enabled = ready,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.extra_battery_unlock))
+                }
+            }
+        }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -111,6 +163,28 @@ fun DeviceScreen(
                 )
             }
             Switch(checked = demo, onCheckedChange = { client.demoMode = it })
+        }
+    }
+}
+
+@Composable
+private fun AccessoryRow(
+    labelRes: Int,
+    accessory: Accessory,
+    enabled: Boolean,
+    client: ScooterBleClient,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(stringResource(labelRes), modifier = Modifier.weight(1f))
+        OutlinedButton(onClick = { client.accessory(accessory, true) }, enabled = enabled) {
+            Text(stringResource(R.string.action_unlock))
+        }
+        OutlinedButton(onClick = { client.accessory(accessory, false) }, enabled = enabled) {
+            Text(stringResource(R.string.common_close))
         }
     }
 }

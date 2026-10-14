@@ -18,8 +18,14 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      version_name: ${{ steps.version.outputs.version_name }}
+      version_code: ${{ steps.version.outputs.version_code }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -38,11 +44,27 @@ jobs:
           echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
           echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
 
-      - name: Compute version from tag
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Compute version
+        id: version
         run: |
-          echo "VERSION_NAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
-          echo "VERSION_CODE=$(git rev-list --count HEAD)" >> "$GITHUB_ENV"
+          set -euo pipefail
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            version_name="${GITHUB_REF_NAME#v}"
+          else
+            latest="$(git tag -l 'v*' --sort=-v:refname | head -n1)"
+            latest="${latest:-v0.0.0}"
+            base="${latest#v}"
+            major="${base%%.*}"
+            rest="${base#*.}"
+            minor="${rest%%.*}"
+            patch="${rest##*.}"
+            version_name="${major}.${minor}.$((patch + 1))"
+          fi
+          version_code="$(git rev-list --count HEAD)"
+          echo "VERSION_NAME=${version_name}" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=${version_code}" >> "$GITHUB_ENV"
+          echo "version_name=${version_name}" >> "$GITHUB_OUTPUT"
+          echo "version_code=${version_code}" >> "$GITHUB_OUTPUT"
 
       - name: Lint
         run: ./gradlew lint --no-daemon
@@ -80,6 +102,34 @@ jobs:
             app/build/outputs/apk/debug/*.apk
             app/build/outputs/apk/release/*.apk
           generate_release_notes: true
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download release APK
+        uses: actions/download-artifact@v4
+        with:
+          name: app-release
+          path: dist
+
+      - name: Warn on unsigned build
+        run: |
+          if ls dist/*unsigned* >/dev/null 2>&1; then
+            echo "::warning::Release APK is unsigned; check the signing secrets."
+          fi
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.build.outputs.version_name }}
+          name: ${{ needs.build.outputs.version_name }}
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          files: dist/*.apk
 
   instrumented:
     runs-on: ubuntu-latest

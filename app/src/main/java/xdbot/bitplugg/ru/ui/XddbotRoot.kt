@@ -93,7 +93,7 @@ fun XddbotRoot() {
         when (tab) {
             Tab.SCAN -> ScanScreen(client, repository, padding)
             Tab.DEVICE -> DeviceScreen(client, repository, padding)
-            Tab.DATA -> DiagnosticsScreen(client, padding)
+            Tab.DATA -> DiagnosticsScreen(client, app.tripRecorder, padding)
             Tab.SETTINGS -> SettingsScreen(repository, padding)
             Tab.LOGS -> LogsScreen(client, padding)
         }

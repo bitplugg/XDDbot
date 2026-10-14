@@ -1,14 +1,20 @@
 package xdbot.bitplugg.ru.ui.diagnostics
 
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -19,15 +25,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import xdbot.bitplugg.ru.R
 import xdbot.bitplugg.ru.ble.ConnState
 import xdbot.bitplugg.ru.ble.ScooterBleClient
+import xdbot.bitplugg.ru.data.TripRecorder
+import java.util.Locale
 
 @Composable
 fun DiagnosticsScreen(
     client: ScooterBleClient,
+    trip: TripRecorder,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -128,6 +140,8 @@ fun DiagnosticsScreen(
             ) { Text(stringResource(R.string.data_firmware)) }
         }
 
+        TripCard(trip)
+
         if (!ready) {
             Text(
                 stringResource(R.string.data_not_ready),
@@ -152,5 +166,81 @@ private fun StatusRow(label: String, value: String?) {
     }
 }
 
+@Composable
+private fun TripCard(trip: TripRecorder) {
+    val recording by trip.recording.collectAsState()
+    val samples by trip.samples.collectAsState()
+    val context = LocalContext.current
+
+    val export = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("text/csv"),
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        runCatching {
+            context.contentResolver.openOutputStream(uri)?.use {
+                it.write(trip.csv().toByteArray(Charsets.UTF_8))
+            }
+            Toast.makeText(context, "CSV saved", Toast.LENGTH_SHORT).show()
+        }.onFailure {
+            Toast.makeText(context, "Export failed", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text("Trip recorder", style = MaterialTheme.typography.titleMedium)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Button(
+                    onClick = { if (recording) trip.stop() else trip.start() },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(if (recording) "Stop" else "Record")
+                }
+                OutlinedButton(onClick = { trip.clear() }, enabled = !recording && samples.isNotEmpty()) {
+                    Text("Clear")
+                }
+                OutlinedButton(
+                    onClick = { export.launch("xddbot-trip-${System.currentTimeMillis()}.csv") },
+                    enabled = samples.isNotEmpty(),
+                ) {
+                    Text("Export CSV")
+                }
+            }
+            SpeedChart(samples, modifier = Modifier.height(180.dp))
+            Text("${samples.size} points", style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
+private fun SpeedChart(samples: List<xdbot.bitplugg.ru.data.TripSample>, modifier: Modifier = Modifier) {
+    Canvas(modifier = modifier.fillMaxWidth()) {
+        if (samples.size < 2) return@Canvas
+        val speeds = samples.mapNotNull { it.speedKmh }
+        if (speeds.isEmpty()) return@Canvas
+        val min = speeds.minOrNull() ?: 0.0
+        val max = speeds.maxOrNull() ?: 0.0
+        val range = (max - min).takeIf { it > 0.0 } ?: 1.0
+        val dx = size.width / (samples.size - 1)
+        val pathY = { s: xdbot.bitplugg.ru.data.TripSample ->
+            val v = s.speedKmh ?: min
+            size.height * (1f - ((v - min).toFloat() / range.toFloat()))
+        }
+        var prev: Offset? = null
+        samples.forEachIndexed { i, s ->
+            val x = dx * i
+            val y = pathY(s)
+            val p = Offset(x, y)
+            prev = prev?.let { p0 -> drawLine(Color.Gray, p0, p, strokeWidth = 2f); p } ?: p
+        }
+    }
+}
+
 private fun fmt(value: Double, decimals: Int): String =
-    String.format(java.util.Locale.US, "%.${decimals}f", value)
+    String.format(Locale.US, "%.${decimals}f", value)

@@ -111,4 +111,14 @@
     <string name="common_close">Закрыть</string>
     <string name="common_save">Сохранить</string>
     <string name="common_cancel">Отмена</string>
+
+    <string name="extras_title">Дополнительно</string>
+    <string name="extra_light_on">Свет вкл</string>
+    <string name="extra_light_off">Свет выкл</string>
+    <string name="extra_sound">Звук сигнала</string>
+    <string name="extra_accessories">Аксессуары</string>
+    <string name="accessory_helmet">Шлем</string>
+    <string name="accessory_seat">Сиденье</string>
+    <string name="accessory_trunk">Кофр</string>
+    <string name="extra_battery_unlock">Открыть батарею</string>
 </resources>
